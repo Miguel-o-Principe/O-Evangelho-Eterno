@@ -60,17 +60,17 @@ export const ChaptersIndex = () => {
                 </button>
 
                 {/* Gradient Overlays */}
-                <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-background-light dark:from-background-dark to-transparent z-10 pointer-events-none"></div>
-                <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-background-light dark:from-background-dark to-transparent z-10 pointer-events-none"></div>
+                <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-background-light dark:from-background-dark to-transparent z-10 pointer-events-none hidden sm:block"></div>
+                <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-background-light dark:from-background-dark to-transparent z-10 pointer-events-none hidden sm:block"></div>
 
                 {/* Scrollable Area */}
-                <div id="chapter-scroll" ref={scrollContainerRef} className="flex overflow-x-auto snap-x snap-mandatory gap-8 px-8 sm:px-20 pb-12 pt-2 no-scrollbar scroll-smooth items-stretch">
+                <div id="chapter-scroll" ref={scrollContainerRef} className="flex flex-col sm:flex-row sm:overflow-x-auto sm:snap-x sm:snap-mandatory gap-8 px-4 sm:px-20 pb-12 pt-2 no-scrollbar scroll-smooth items-stretch">
 
                     {/* Author's New Post Card */}
                     {isAuthor && (
                         <div
                             onClick={() => alert('Para criar uma nova postagem, basta adicionar um arquivo .mdx na pasta src/posts! O sistema carregará automaticamente.')}
-                            className="chapter-card snap-start snap-always shrink-0 w-[280px] sm:w-[340px] flex flex-col items-center justify-center gap-4 rounded-2xl bg-primary/5 dark:bg-primary/10 border-2 border-dashed border-primary/30 hover:border-primary/60 hover:bg-primary/10 dark:hover:bg-primary/20 transition-all cursor-pointer group"
+                            className="chapter-card sm:snap-start sm:snap-always shrink-0 w-full sm:w-[340px] flex flex-col items-center justify-center gap-4 rounded-2xl bg-primary/5 dark:bg-primary/10 border-2 border-dashed border-primary/30 hover:border-primary/60 hover:bg-primary/10 dark:hover:bg-primary/20 transition-all cursor-pointer group py-12 sm:py-0"
                         >
                             <div className="size-16 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform">
                                 <span className="material-symbols-outlined text-3xl text-primary">add</span>
@@ -85,7 +85,7 @@ export const ChaptersIndex = () => {
                         <div
                             key={post.slug}
                             onClick={() => navigate(`/post/${post.slug}`)}
-                            className="chapter-card snap-start snap-always shrink-0 w-[280px] sm:w-[340px] flex flex-col gap-0 rounded-2xl bg-white dark:bg-card-dark border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-2xl transition-all overflow-hidden cursor-pointer"
+                            className="chapter-card sm:snap-start sm:snap-always shrink-0 w-full sm:w-[340px] flex flex-col gap-0 rounded-2xl bg-white dark:bg-card-dark border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-2xl transition-all overflow-hidden cursor-pointer"
                         >
                             <div
                                 className="w-full h-48 bg-cover bg-center relative"
@@ -118,7 +118,7 @@ export const ChaptersIndex = () => {
                         <div
                             key={chap.id}
                             onClick={() => navigate(`/capitulo/${chap.id}`)}
-                            className="chapter-card snap-start snap-always shrink-0 w-[280px] sm:w-[340px] flex flex-col gap-0 rounded-2xl bg-white dark:bg-card-dark border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-2xl transition-all overflow-hidden cursor-pointer"
+                            className="chapter-card sm:snap-start sm:snap-always shrink-0 w-full sm:w-[340px] flex flex-col gap-0 rounded-2xl bg-white dark:bg-card-dark border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-2xl transition-all overflow-hidden cursor-pointer"
                         >
                             <div
                                 className="w-full aspect-[3/4] bg-cover bg-center relative chapter-img"
