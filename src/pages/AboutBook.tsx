@@ -2,7 +2,7 @@ import React from 'react';
 
 export const AboutBook = () => {
     return (
-        <main className="max-w-4xl mx-auto px-6 py-12 lg:py-24 fade-up">
+        <main className="max-w-4xl mx-auto px-4 sm:px-6 py-12 lg:py-24 fade-up break-words">
             <style>{`
                 .text-gradient {
                     background: linear-gradient(to right, #ec1337, #ff4d6d);
@@ -52,7 +52,7 @@ export const AboutBook = () => {
                     <p>Na visão do autor, o desejo humano não precede a proibição; ao contrário, a Lei inaugura o Desejo ao demarcar o território do proibido. O desejo de Eva pelo fruto não nasce de uma fome biológica, mas de uma voracidade simbólica gerada pela interdição.</p>
 
                     <div className="overflow-x-auto rounded-2xl border border-slate-100 dark:border-white/5 bg-white dark:bg-card-dark my-8 shadow-lg">
-                        <table className="w-full text-left border-collapse">
+                        <table className="w-full text-left border-collapse min-w-[600px]">
                             <thead>
                                 <tr>
                                     <th className="p-4 text-xs uppercase tracking-widest border-b border-slate-100 dark:border-white/10 dark:text-primary">Conceito Lacaniano</th>
@@ -96,7 +96,7 @@ export const AboutBook = () => {
                     <p>O autor propõe uma separação cirúrgica entre o &quot;Deus da Lei&quot; e o &quot;Pai da Graça&quot;. Uma das teses mais provocativas é que a interação de Israel foi mediada exclusivamente por anjos, seres funcionais e amorais que operam pela lógica da retribuição estrita.</p>
 
                     <div className="overflow-x-auto rounded-2xl border border-slate-100 dark:border-white/5 bg-white dark:bg-card-dark my-8 shadow-lg">
-                        <table className="w-full text-left border-collapse">
+                        <table className="w-full text-left border-collapse min-w-[600px]">
                             <thead>
                                 <tr>
                                     <th className="p-4 text-xs uppercase tracking-widest border-b border-slate-100 dark:border-white/10 dark:text-primary">Personagem</th>
@@ -140,7 +140,7 @@ export const AboutBook = () => {
                     <p>A premissa cosmológica mais radical da obra é a de que a Cruz de Cristo é a &quot;Causa Primeira&quot; da criação. O universo tomou &quot;vida emprestada&quot; da morte futura de Cristo através do princípio da <strong>retrocausalidade</strong>.</p>
 
                     <div className="overflow-x-auto rounded-2xl border border-slate-100 dark:border-white/5 bg-white dark:bg-card-dark my-8 shadow-lg">
-                        <table className="w-full text-left border-collapse">
+                        <table className="w-full text-left border-collapse min-w-[600px]">
                             <thead>
                                 <tr>
                                     <th className="p-4 text-xs uppercase tracking-widest border-b border-slate-100 dark:border-white/10 dark:text-primary">Dimensão Temporal</th>
@@ -182,7 +182,7 @@ export const AboutBook = () => {
                     <p>O autor propõe um <strong>&quot;Ateísmo Cristão&quot;</strong> em relação ao Deus da Lei como o único caminho para a fé autêntica. A Cruz é o funeral da religião burocrática, onde o Juiz morreu para salvar o réu.</p>
 
                     <div className="overflow-x-auto rounded-2xl border border-slate-100 dark:border-white/5 bg-white dark:bg-card-dark my-8 shadow-lg">
-                        <table className="w-full text-left border-collapse">
+                        <table className="w-full text-left border-collapse min-w-[600px]">
                             <thead>
                                 <tr>
                                     <th className="p-4 text-xs uppercase tracking-widest border-b border-slate-100 dark:border-white/10 dark:text-primary">Conceito Filosófico</th>
