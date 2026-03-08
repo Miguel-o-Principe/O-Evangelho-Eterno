@@ -15,9 +15,21 @@ export const Settings = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
+    // Notifications State
+    const [notifications, setNotifications] = useState({
+        newChapters: true,
+        authorInteractions: true,
+        weeklyNewsletter: false
+    });
+
     useEffect(() => {
         if (user?.user_metadata?.avatar_url) {
             setAvatarUrl(user.user_metadata.avatar_url);
+        }
+
+        // Load notifications from metadata if they exist
+        if (user?.user_metadata?.notifications) {
+            setNotifications(user.user_metadata.notifications);
         }
     }, [user]);
 
@@ -68,6 +80,8 @@ export const Settings = () => {
 
         const formData = new FormData(e.target as HTMLFormElement);
         const fullName = (formData.get('fullName') as string).trim();
+        const title = (formData.get('title') as string) || '';
+        const shortBio = (formData.get('shortBio') as string) || '';
 
         if (!fullName) {
             setErrorMsg('Nome de exibição é obrigatório.');
@@ -76,7 +90,11 @@ export const Settings = () => {
         }
 
         const { error } = await supabase.auth.updateUser({
-            data: { full_name: fullName }
+            data: {
+                full_name: fullName,
+                title: title,
+                short_bio: shortBio
+            }
         });
 
         if (error) {
@@ -126,6 +144,26 @@ export const Settings = () => {
             setSuccess(true);
             (e.target as HTMLFormElement).reset();
             setTimeout(() => setSuccess(false), 2000);
+        }
+    };
+
+    const handleNotificationChange = async (key: keyof typeof notifications) => {
+        const newNotifications = {
+            ...notifications,
+            [key]: !notifications[key]
+        };
+
+        setNotifications(newNotifications);
+
+        // Try to save to Supabase silently
+        try {
+            await supabase.auth.updateUser({
+                data: { notifications: newNotifications }
+            });
+        } catch (error) {
+            console.error('Failed to save notification preference', error);
+            // Revert on fail
+            setNotifications(notifications);
         }
     };
 
@@ -211,12 +249,12 @@ export const Settings = () => {
                                         </div>
                                         <div className="space-y-1.5">
                                             <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Título / Ocupação</label>
-                                            <input type="text" defaultValue="Autor & Mensageiro" className="w-full bg-slate-50 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800 rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary/40 transition-all outline-none text-sm" />
+                                            <input type="text" name="title" defaultValue={user?.user_metadata?.title || 'Autor & Mensageiro'} className="w-full bg-slate-50 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800 rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary/40 transition-all outline-none text-sm" />
                                         </div>
                                     </div>
                                     <div className="space-y-1.5">
                                         <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Biografia Curta</label>
-                                        <textarea rows={3} defaultValue="Eu sou..." placeholder="Conte um pouco sobre você" className="w-full bg-slate-50 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800 rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary/40 transition-all outline-none text-sm"></textarea>
+                                        <textarea rows={3} name="shortBio" defaultValue={user?.user_metadata?.short_bio || 'Eu sou...'} placeholder="Conte um pouco sobre você" className="w-full bg-slate-50 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800 rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary/40 transition-all outline-none text-sm"></textarea>
                                     </div>
                                     <button type="submit" disabled={saving || success} className={`px-8 py-3 font-bold rounded-xl shadow-lg transition-all text-sm flex items-center gap-2 ${success ? 'bg-emerald-500 text-white shadow-emerald-500/20' : 'bg-primary text-white shadow-primary/20 hover:brightness-110'}`}>
                                         {saving && <span className="material-symbols-outlined animate-spin text-sm">sync</span>}
@@ -314,7 +352,7 @@ export const Settings = () => {
                                             <p className="text-[10px] text-slate-500">Receba um aviso quando um novo capítulo for publicado.</p>
                                         </div>
                                         <label className="relative inline-flex items-center cursor-pointer">
-                                            <input type="checkbox" defaultChecked className="sr-only peer" />
+                                            <input type="checkbox" checked={notifications.newChapters} onChange={() => handleNotificationChange('newChapters')} className="sr-only peer" />
                                             <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
                                         </label>
                                     </div>
@@ -324,7 +362,7 @@ export const Settings = () => {
                                             <p className="text-[10px] text-slate-500">Seja notificado quando o autor responder seus comentários.</p>
                                         </div>
                                         <label className="relative inline-flex items-center cursor-pointer">
-                                            <input type="checkbox" defaultChecked className="sr-only peer" />
+                                            <input type="checkbox" checked={notifications.authorInteractions} onChange={() => handleNotificationChange('authorInteractions')} className="sr-only peer" />
                                             <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
                                         </label>
                                     </div>
@@ -334,7 +372,7 @@ export const Settings = () => {
                                             <p className="text-[10px] text-slate-500">Resumo das discussões teológicas da semana.</p>
                                         </div>
                                         <label className="relative inline-flex items-center cursor-pointer">
-                                            <input type="checkbox" className="sr-only peer" />
+                                            <input type="checkbox" checked={notifications.weeklyNewsletter} onChange={() => handleNotificationChange('weeklyNewsletter')} className="sr-only peer" />
                                             <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
                                         </label>
                                     </div>
