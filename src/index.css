@@ -1,0 +1,237 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    --color-primary: #ec1337;
+    --color-background-light: #f8f6f6;
+    --color-background-dark: #1a0a0c;
+    --color-card-dark: #2a1418;
+    --color-dark-bg: #0f0506;
+    --color-dark-card: #1a0a0c;
+    --color-sepia-bg: #f4ecd8;
+    --color-sepia-text: #433422;
+
+    --font-display: "Noto Serif", serif;
+    --font-serif: "Noto Serif", serif;
+    --font-sans: "Inter", sans-serif;
+}
+
+body {
+    @apply antialiased transition-colors duration-300;
+}
+
+:root {
+    --reader-font-size: 1.15rem;
+}
+
+body.sepia {
+    background-color: var(--color-sepia-bg);
+    color: var(--color-sepia-text);
+}
+
+.sepia .glass-nav {
+    background: rgba(244, 236, 216, 0.8);
+    border-color: rgba(67, 52, 34, 0.1);
+}
+
+.sepia .prose-custom {
+    color: var(--color-sepia-text);
+}
+
+.sepia .table-container {
+    border-color: #d1c7ac;
+}
+
+.sepia th {
+    background-color: #ebe3cf;
+    border-color: #d1c7ac;
+    color: var(--color-sepia-text);
+}
+
+.sepia td {
+    border-color: #d1c7ac;
+    color: var(--color-sepia-text);
+}
+
+.glass-nav {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.dark .glass-nav {
+    background: rgba(26, 10, 12, 0.8);
+}
+
+.prose-custom p {
+    margin-bottom: 2rem;
+    line-height: 1.85;
+    font-size: var(--reader-font-size);
+    letter-spacing: -0.011em;
+}
+
+.dropcap::first-letter {
+    font-family: 'Noto Serif', serif;
+    float: left;
+    font-size: 5rem;
+    line-height: 0.85;
+    padding-top: 0.5rem;
+    padding-right: 0.85rem;
+    font-weight: 700;
+    color: var(--color-primary);
+}
+
+.fade-up {
+    animation: fadeUp 1s ease-out forwards;
+}
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-slideIn {
+    animation: slideIn 0.2s ease-out;
+}
+
+.table-container {
+    margin: 3.5rem 0;
+    overflow-x: auto;
+    border-radius: 1.25rem;
+    border: 1px solid #e2e8f0;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.dark .table-container {
+    border-color: #334155;
+    background: rgba(26, 10, 12, 0.5);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    line-height: 1.5;
+}
+
+th {
+    text-align: left;
+    padding: 1.25rem 1rem;
+    background-color: #f8fafc;
+    font-weight: 700;
+    border-bottom: 2px solid #e2e8f0;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+}
+
+.dark th {
+    background-color: #1e293b;
+    border-bottom-color: #334155;
+    color: #94a3b8;
+}
+
+td {
+    padding: 1.25rem 1rem;
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: top;
+}
+
+.dark td {
+    border-bottom-color: #334155;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+.book-container {
+    perspective: 1200px;
+}
+
+.book-wrapper {
+    box-shadow: 25px 25px 50px rgba(0, 0, 0, 0.5), -5px 0 15px rgba(0, 0, 0, 0.1);
+    transform: rotateY(-6deg) translateX(5px);
+    transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.book-wrapper:hover {
+    transform: rotateY(0deg) translateX(0px) scale(1.02);
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-20px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+.float-animation {
+    animation: float 6s ease-in-out infinite;
+}
+
+.book-image {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+.auth-content {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.chapter-card {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.chapter-card:hover {
+    transform: translateY(-4px);
+}
+
+#chapter-scroll {
+    scroll-padding-left: 2rem;
+    scroll-behavior: smooth;
+}
+
+@media (min-width: 640px) {
+    #chapter-scroll {
+        scroll-padding-left: 5rem;
+    }
+}

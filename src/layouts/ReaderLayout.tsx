@@ -1,0 +1,121 @@
+import React, { useState, useEffect } from 'react';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { useTheme } from '../contexts/ThemeContext';
+import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabase';
+import { ReaderSettings } from '../components/ReaderSettings';
+
+export const ReaderLayout = () => {
+    const { theme, toggleTheme } = useTheme();
+    const { user, session } = useAuth();
+    const [settingsOpen, setSettingsOpen] = useState(false);
+    const [userMenuOpen, setUserMenuOpen] = useState(false);
+    const [progress, setProgress] = useState(0);
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    const handleLogout = async () => {
+        await supabase.auth.signOut();
+        navigate('/');
+    };
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            setProgress(scrolled);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    const closeMenu = (e: MouseEvent) => {
+        if (!(e.target as Element).closest('.user-menu-container')) {
+            setUserMenuOpen(false);
+        }
+    };
+
+    useEffect(() => {
+        document.addEventListener('click', closeMenu);
+        return () => document.removeEventListener('click', closeMenu);
+    }, []);
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [location.pathname]);
+
+    return (
+        <div className="min-h-screen bg-[#f8f6f6] dark:bg-dark-bg text-slate-800 dark:text-slate-200 font-sans transition-colors duration-500">
+            <nav className="glass-nav fixed top-0 w-full z-50 border-b border-slate-200 dark:border-white/10">
+                <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+                    <Link to="/capitulos" className="flex items-center gap-2 group transition-all">
+                        <span className="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">arrow_back</span>
+                        <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">Capítulos</span>
+                    </Link>
+
+                    {/* Chapter info will be dynamic in the page itself, we can leave the center empty here or just static for now */}
+                    <div className="hidden md:flex flex-col items-center">
+                        <span className="text-[9px] uppercase tracking-[0.4em] text-primary font-bold mb-0.5">O Evangelho Eterno</span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        <button onClick={() => setSettingsOpen(!settingsOpen)} className="p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-full transition-colors relative" title="Configurações de Leitura">
+                            <span className="material-symbols-outlined text-xl">settings_brightness</span>
+                        </button>
+                        <button onClick={toggleTheme} className="p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-full transition-colors hidden sm:block">
+                            <span className="material-symbols-outlined text-xl">{theme === 'dark' ? 'light_mode' : 'dark_mode'}</span>
+                        </button>
+
+                        {/* User Menu */}
+                        <div className="relative user-menu-container ml-2">
+                            <button
+                                onClick={() => setUserMenuOpen(!userMenuOpen)}
+                                className="size-8 rounded-full border border-slate-200 dark:border-slate-700 bg-center bg-cover hover:ring-2 hover:ring-primary transition-all overflow-hidden relative shadow-sm"
+                                title="Menu do Usuário"
+                            >
+                                <img
+                                    src={user?.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${user?.user_metadata?.full_name || 'User'}&background=random`}
+                                    alt="Avatar"
+                                    className="w-full h-full object-cover"
+                                />
+                            </button>
+                            {userMenuOpen && (
+                                <div className="absolute right-0 mt-3 w-48 bg-white dark:bg-card-dark border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl py-3 z-50 animate-slideIn">
+                                    {!session ? (
+                                        <>
+                                            <Link to="/" className="flex items-center gap-3 px-5 py-2.5 text-sm hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                                                <span className="material-symbols-outlined text-xl opacity-60">login</span> Login
+                                            </Link>
+                                            <Link to="/?action=register" className="flex items-center gap-3 px-5 py-2.5 text-sm hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                                                <span className="material-symbols-outlined text-xl opacity-60">person_add</span> Cadastro
+                                            </Link>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="px-5 py-2 mb-2 border-b border-slate-100 dark:border-white/5">
+                                                <p className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">{user?.user_metadata?.full_name || 'Usuário'}</p>
+                                                <p className="text-[10px] text-slate-500 truncate">{user?.email}</p>
+                                            </div>
+                                            <Link to="/configuracoes" className="flex items-center gap-3 px-5 py-2.5 text-sm hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                                                <span className="material-symbols-outlined text-xl opacity-60">settings</span> Configurações
+                                            </Link>
+                                            <button onClick={handleLogout} className="w-full flex items-center gap-3 px-5 py-2.5 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors text-left">
+                                                <span className="material-symbols-outlined text-xl opacity-80">logout</span> Sair
+                                            </button>
+                                        </>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                <ReaderSettings isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} />
+                <div className="h-[3px] bg-primary transition-all duration-300 shadow-[0_0_10px_rgba(236,19,55,0.5)]" style={{ width: `${progress}%` }}></div>
+            </nav>
+
+            <Outlet />
+        </div>
+    );
+};
