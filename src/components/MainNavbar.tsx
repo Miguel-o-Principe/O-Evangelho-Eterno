@@ -66,7 +66,7 @@ export const MainNavbar: React.FC<MainNavbarProps> = ({ onMenuToggle }) => {
                             title="Menu do Usuário"
                         >
                             <img
-                                src={user?.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${user?.user_metadata?.full_name || 'User'}&background=random`}
+                                src={user?.user_metadata?.avatar_url || user?.user_metadata?.picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.user_metadata?.full_name || 'User')}&background=random`}
                                 alt="Avatar"
                                 className="w-full h-full object-cover"
                             />

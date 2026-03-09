@@ -23,8 +23,8 @@ export const Settings = () => {
     });
 
     useEffect(() => {
-        if (user?.user_metadata?.avatar_url) {
-            setAvatarUrl(user.user_metadata.avatar_url);
+        if (user?.user_metadata?.avatar_url || user?.user_metadata?.picture) {
+            setAvatarUrl(user.user_metadata.avatar_url || user.user_metadata.picture);
         }
 
         // Load notifications from metadata if they exist
@@ -61,6 +61,10 @@ export const Settings = () => {
 
             if (updateError) {
                 throw updateError;
+            }
+
+            if (user?.id) {
+                await supabase.from('comentarios').update({ avatar_url: data.publicUrl }).eq('user_id', user.id);
             }
 
             setAvatarUrl(data.publicUrl);
@@ -101,6 +105,9 @@ export const Settings = () => {
             setErrorMsg(error.message);
             setSaving(false);
         } else {
+            if (user?.id) {
+                await supabase.from('comentarios').update({ user_name: fullName }).eq('user_id', user.id);
+            }
             setSaving(false);
             setSuccess(true);
             setTimeout(() => setSuccess(false), 2000);
@@ -218,7 +225,7 @@ export const Settings = () => {
 
                                 <div className="flex items-center gap-6 mb-8">
                                     <div className="size-20 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center border-2 border-primary overflow-hidden shrink-0">
-                                        <img src={avatarUrl || "https://ui-avatars.com/api/?name=" + (user?.user_metadata?.full_name || 'U') + "&background=random"} alt="Avatar" className="w-full h-full object-cover" />
+                                        <img src={avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.user_metadata?.full_name || 'U')}&background=random`} alt="Avatar" className="w-full h-full object-cover" />
                                     </div>
                                     <div>
                                         <input

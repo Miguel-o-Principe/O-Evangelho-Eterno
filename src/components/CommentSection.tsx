@@ -107,7 +107,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                         chapter_id: chapterId,
                         user_id: user.id,
                         user_name: user.user_metadata?.full_name || 'Usuário do Portal',
-                        avatar_url: user.user_metadata?.avatar_url || null,
+                        avatar_url: user.user_metadata?.avatar_url || user.user_metadata?.picture || null,
                         content: newComment.trim(),
                         parent_id: null
                     }
@@ -146,7 +146,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                         chapter_id: chapterId,
                         user_id: user.id,
                         user_name: user.user_metadata?.full_name || 'Usuário do Portal',
-                        avatar_url: user.user_metadata?.avatar_url || null,
+                        avatar_url: user.user_metadata?.avatar_url || user.user_metadata?.picture || null,
                         content: replyContent.trim(),
                         parent_id: parentId
                     }
@@ -253,7 +253,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                         <div className="flex items-start gap-4">
                             <div className="hidden sm:flex size-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 items-center justify-center shrink-0 overflow-hidden">
                                 <img
-                                    src={user.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${user.user_metadata?.full_name || 'User'}&background=random`}
+                                    src={user.user_metadata?.avatar_url || user.user_metadata?.picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.user_metadata?.full_name || 'User')}&background=random`}
                                     alt="Avatar"
                                     className="w-full h-full object-cover"
                                 />
@@ -316,7 +316,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                                 <div className="flex gap-4">
                                     <div className="hidden sm:flex size-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 items-center justify-center shrink-0 overflow-hidden">
                                         <img
-                                            src={comment.avatar_url || `https://ui-avatars.com/api/?name=${comment.user_name}&background=random`}
+                                            src={(comment.user_id === user?.id ? (user?.user_metadata?.avatar_url || user?.user_metadata?.picture) : comment.avatar_url) || `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.user_name)}&background=random`}
                                             alt="Avatar"
                                             className="w-full h-full object-cover"
                                         />
@@ -392,7 +392,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                                                 <div className="absolute top-5 -left-6 w-4 h-[2px] bg-slate-100 dark:bg-slate-800"></div>
                                                 <div className="hidden sm:flex size-8 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 items-center justify-center shrink-0 overflow-hidden">
                                                     <img
-                                                        src={reply.avatar_url || `https://ui-avatars.com/api/?name=${reply.user_name}&background=random`}
+                                                        src={(reply.user_id === user?.id ? (user?.user_metadata?.avatar_url || user?.user_metadata?.picture) : reply.avatar_url) || `https://ui-avatars.com/api/?name=${encodeURIComponent(reply.user_name)}&background=random`}
                                                         alt="Avatar"
                                                         className="w-full h-full object-cover"
                                                     />
@@ -448,7 +448,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                                             <div className="flex items-start gap-3">
                                                 <div className="hidden sm:flex size-8 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 items-center justify-center shrink-0 overflow-hidden">
                                                     <img
-                                                        src={user?.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${user?.user_metadata?.full_name || 'User'}&background=random`}
+                                                        src={user?.user_metadata?.avatar_url || user?.user_metadata?.picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.user_metadata?.full_name || 'User')}&background=random`}
                                                         alt="Avatar"
                                                         className="w-full h-full object-cover"
                                                     />
