@@ -34,7 +34,7 @@ export const Landing = () => {
                         </h1>
                         <div className="h-1 w-24 bg-primary rounded-full"></div>
                         <p className="text-slate-600 dark:text-slate-400 font-light text-lg xl:text-2xl leading-relaxed max-w-2xl">
-                            Mergulhe nas profundezas da Arquitetura da Graça. Revisite o Jardim do Éden e ganhe um novo olhar sobre toda a Realidade. Uma união ousada e inovadora de Teologia, Filosofia, Cosmologia e Psicanálise.
+                            Você está exausto do teatro religioso? Este não é mais um manual moral, é a implosão de todo o esforço de agradar a um Deus que já está saciado na Cruz. Mergulhe nas profundezas da Arquitetura da Graça. Revisite o Jardim do Éden e ganhe um novo olhar sobre toda a Realidade. Uma união ousada e inovadora de Teologia, Filosofia, Cosmologia e Psicanálise.
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-4 pt-8 w-full sm:w-auto">
