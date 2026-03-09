@@ -213,19 +213,48 @@ export const AboutBook = () => {
             </section>
 
             {/* Conclusão */}
-            <section className="mt-20 p-10 bg-white dark:bg-card-dark rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl relative overflow-hidden text-center lg:text-left">
+            <section className="mt-20 p-10 bg-white dark:bg-card-dark rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-2 bg-primary"></div>
-                <h2 className="text-3xl font-bold mb-8 italic">V. Conclusão: O Fim do Teatro Religioso</h2>
-                <div className="space-y-6 font-light leading-relaxed text-lg text-slate-600 dark:text-slate-400">
-                    <p>
-                        O livro convida o leitor a abandonar o papel de &quot;Adão Performativo&quot; e aceitar a nudez da filiação. A arquitetura da obra revela que o universo não é um palco de testes morais, mas um cenário construído ao redor da Cruz.
-                    </p>
-                    <p>
-                        A vida no tempo é apenas o processo de despertar para essa realidade consumada. O convite de <strong>Miguel, o Príncipe</strong>, é para que o homem saia da neurose e entre no descanso de quem descobriu que a &quot;Espada de Fogo&quot; já se apagou no peito de Jesus.
-                    </p>
-                    <p className="font-bold text-slate-900 dark:text-white mt-10 text-xl">
-                        O Evangelho não é uma nova religião, mas o fim de todas elas.
-                    </p>
+                <div className="flex flex-col lg:flex-row gap-12 items-center justify-between">
+                    <div className="flex-1 text-center lg:text-left">
+                        <h2 className="text-3xl font-bold mb-8 italic">V. Conclusão: O Fim do Teatro Religioso</h2>
+                        <div className="space-y-6 font-light leading-relaxed text-lg text-slate-600 dark:text-slate-400">
+                            <p>
+                                O livro convida o leitor a abandonar o papel de &quot;Adão Performativo&quot; e aceitar a nudez da filiação. A arquitetura da obra revela que o universo não é um palco de testes morais, mas um cenário construído ao redor da Cruz.
+                            </p>
+                            <p>
+                                A vida no tempo é apenas o processo de despertar para essa realidade consumada. O convite de <strong>Miguel, o Príncipe</strong>, é para que o homem saia da neurose e entre no descanso de quem descobriu que a &quot;Espada de Fogo&quot; já se apagou no peito de Jesus.
+                            </p>
+                            <p className="font-bold text-slate-900 dark:text-white mt-10 text-xl">
+                                O Evangelho não é uma nova religião, mas o fim de todas elas.
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* QR Code Amazon Box */}
+                    <div className="flex flex-col items-center justify-center p-8 bg-slate-50 dark:bg-slate-900/50 rounded-3xl border border-slate-100 dark:border-slate-800 shrink-0 w-full sm:w-auto mt-8 lg:mt-0 relative overflow-hidden group">
+                        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-primary mb-6 text-center">Adquira a Obra</h3>
+
+                        <div className="bg-white p-3 rounded-2xl shadow-sm mb-6 border border-slate-100 relative z-10 transition-transform duration-300 group-hover:scale-105 group-hover:shadow-xl group-hover:shadow-primary/20">
+                            <img
+                                src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://www.amazon.com.br/dp/B0GM8HTQF4&margin=2"
+                                alt="QR Code Amazon"
+                                className="w-32 h-32 md:w-40 md:h-40"
+                            />
+                        </div>
+
+                        <a
+                            href="https://www.amazon.com.br/dp/B0GM8HTQF4"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="relative z-10 flex items-center gap-2 px-8 py-4 bg-primary text-white font-bold rounded-xl hover:brightness-110 transition-all text-xs uppercase tracking-[0.2em] shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-1"
+                        >
+                            <span className="material-symbols-outlined text-lg">shopping_cart</span>
+                            Amazon.com.br
+                        </a>
+                        <p className="text-[10px] text-slate-400 mt-4 text-center font-medium">Aponte a câmera do celular<br />para comprar o e-book ou físico</p>
+                    </div>
                 </div>
             </section>
         </main>

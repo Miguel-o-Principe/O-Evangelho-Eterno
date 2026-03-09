@@ -419,6 +419,22 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                                                                 <span className={`material-symbols-outlined text-[14px] ${reply.likes?.includes(user?.id || '') ? 'font-variation-fill' : ''}`}>thumb_up</span>
                                                                 {reply.likes?.length || 0}
                                                             </button>
+
+                                                            <button
+                                                                onClick={() => {
+                                                                    if (!session) {
+                                                                        alert('Para responder a este comentário, você precisa fazer login no portal.');
+                                                                        return;
+                                                                    }
+                                                                    setReplyingTo(replyingTo === comment.id ? null : comment.id);
+                                                                    setReplyContent('');
+                                                                }}
+                                                                className="flex items-center gap-1 font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-all text-[10px]"
+                                                            >
+                                                                <span className="material-symbols-outlined text-[14px]">reply</span>
+                                                                Responder
+                                                            </button>
+
                                                             {reply.author_loved && (
                                                                 <div className="flex items-center gap-1 px-1.5 py-0.5 bg-primary/5 rounded-full border border-primary/10">
                                                                     <span className="material-symbols-outlined text-[10px] font-variation-fill text-primary">favorite</span>
