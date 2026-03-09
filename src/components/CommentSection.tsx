@@ -11,6 +11,7 @@ interface Comment {
     user_id: string;
     likes?: string[];
     author_loved?: boolean;
+    parent_id?: string | null;
 }
 
 interface CommentSectionProps {
@@ -36,6 +37,8 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
+    const [replyingTo, setReplyingTo] = useState<string | null>(null);
+    const [replyContent, setReplyContent] = useState('');
 
     useEffect(() => {
         fetchComments();
@@ -103,7 +106,8 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                         chapter_id: chapterId,
                         user_id: user.id,
                         user_name: user.user_metadata?.full_name || 'Usuário do Portal',
-                        content: newComment.trim()
+                        content: newComment.trim(),
+                        parent_id: null
                     }
                 ]);
 
@@ -114,6 +118,44 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
         } catch (error: any) {
             console.error('Erro ao postar comentário:', error);
             setErrorMsg('Erro ao publicar comentário: ' + error.message);
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    const handleReplySubmit = async (e: React.FormEvent, parentId: string) => {
+        e.preventDefault();
+
+        if (!session || !user) {
+            setErrorMsg('Você precisa estar logado para responder.');
+            return;
+        }
+
+        if (!replyContent.trim()) return;
+
+        setSubmitting(true);
+        setErrorMsg('');
+
+        try {
+            const { error } = await supabase
+                .from('comentarios')
+                .insert([
+                    {
+                        chapter_id: chapterId,
+                        user_id: user.id,
+                        user_name: user.user_metadata?.full_name || 'Usuário do Portal',
+                        content: replyContent.trim(),
+                        parent_id: parentId
+                    }
+                ]);
+
+            if (error) throw error;
+
+            setReplyContent('');
+            setReplyingTo(null);
+        } catch (error: any) {
+            console.error('Erro ao postar resposta:', error);
+            setErrorMsg('Erro ao publicar resposta: ' + error.message);
         } finally {
             setSubmitting(false);
         }
@@ -263,63 +305,187 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                     </div>
                 ) : (
                     <div className="space-y-6">
-                        {comments.map((comment) => (
-                            <div key={comment.id} className="flex gap-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                                <div className="hidden sm:flex size-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 items-center justify-center shrink-0 overflow-hidden">
-                                    {/* As we don't store avatars in the comment table, we'll use a generic one or initials from user_name for other users to save queries. In a production app, we could join the profiles table */}
-                                    <img
-                                        src={`https://ui-avatars.com/api/?name=${comment.user_name}&background=random`}
-                                        alt="Avatar"
-                                        className="w-full h-full object-cover"
-                                    />
-                                </div>
-                                <div className="flex-1 bg-white dark:bg-card-dark rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-slate-800 relative group">
-                                    <div className="flex items-baseline justify-between mb-3 border-b border-slate-50 dark:border-slate-800/50 pb-3">
-                                        <div className="flex items-center gap-2">
-                                            <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
-                                                {comment.user_name}
-                                                {isAuthor && comment.user_id === user?.id && (
-                                                    <span className="material-symbols-outlined text-primary text-[14px] leading-none" title="Autor">verified</span>
-                                                )}
-                                            </h4>
-                                        </div>
-                                        <span className="text-[10px] text-slate-400 font-medium">{formatDate(comment.created_at)}</span>
+                        {comments.filter(c => !c.parent_id).map((comment) => (
+                            <div key={comment.id} className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+                                <div className="flex gap-4">
+                                    <div className="hidden sm:flex size-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 items-center justify-center shrink-0 overflow-hidden">
+                                        <img
+                                            src={`https://ui-avatars.com/api/?name=${comment.user_name}&background=random`}
+                                            alt="Avatar"
+                                            className="w-full h-full object-cover"
+                                        />
                                     </div>
-                                    <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-wrap mb-4">
-                                        {comment.content}
-                                    </p>
+                                    <div className="flex-1 bg-white dark:bg-card-dark rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-slate-800 relative group">
+                                        <div className="flex items-baseline justify-between mb-3 border-b border-slate-50 dark:border-slate-800/50 pb-3">
+                                            <div className="flex items-center gap-2">
+                                                <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                                                    {comment.user_name}
+                                                    {isAuthor && comment.user_id === user?.id && (
+                                                        <span className="material-symbols-outlined text-primary text-[14px] leading-none" title="Autor">verified</span>
+                                                    )}
+                                                </h4>
+                                            </div>
+                                            <span className="text-[10px] text-slate-400 font-medium">{formatDate(comment.created_at)}</span>
+                                        </div>
+                                        <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-wrap mb-4">
+                                            {comment.content}
+                                        </p>
 
-                                    {/* Interactions Footer */}
-                                    <div className="flex items-center gap-4 mt-2 justify-between">
-                                        <div className="flex items-center gap-4">
-                                            <button
-                                                onClick={() => handleLike(comment.id, comment.likes || [])}
-                                                disabled={!user}
-                                                className={`flex items-center gap-1.5 text-xs font-bold transition-all ${comment.likes?.includes(user?.id || '') ? 'text-primary' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'} ${!user && 'opacity-50 cursor-not-allowed'}`}
-                                            >
-                                                <span className={`material-symbols-outlined text-[18px] ${comment.likes?.includes(user?.id || '') ? 'font-variation-fill' : ''}`}>thumb_up</span>
-                                                {comment.likes?.length || 0}
-                                            </button>
+                                        {/* Interactions Footer */}
+                                        <div className="flex items-center gap-4 mt-2 justify-between">
+                                            <div className="flex items-center gap-4">
+                                                <button
+                                                    onClick={() => handleLike(comment.id, comment.likes || [])}
+                                                    disabled={!user}
+                                                    className={`flex items-center gap-1.5 text-xs font-bold transition-all ${comment.likes?.includes(user?.id || '') ? 'text-primary' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'} ${!user && 'opacity-50 cursor-not-allowed'}`}
+                                                >
+                                                    <span className={`material-symbols-outlined text-[18px] ${comment.likes?.includes(user?.id || '') ? 'font-variation-fill' : ''}`}>thumb_up</span>
+                                                    {comment.likes?.length || 0}
+                                                </button>
 
-                                            {comment.author_loved && (
-                                                <div className="flex items-center gap-1.5 px-2 py-1 bg-primary/5 rounded-full border border-primary/10">
-                                                    <span className="material-symbols-outlined text-[14px] font-variation-fill text-primary">favorite</span>
-                                                    <span className="text-[9px] font-bold text-primary uppercase tracking-widest">O Autor Amou</span>
-                                                </div>
+                                                <button
+                                                    onClick={() => {
+                                                        setReplyingTo(replyingTo === comment.id ? null : comment.id);
+                                                        setReplyContent('');
+                                                    }}
+                                                    className="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-all"
+                                                >
+                                                    <span className="material-symbols-outlined text-[18px]">reply</span>
+                                                    Responder
+                                                </button>
+
+                                                {comment.author_loved && (
+                                                    <div className="flex items-center gap-1.5 px-2 py-1 bg-primary/5 rounded-full border border-primary/10">
+                                                        <span className="material-symbols-outlined text-[14px] font-variation-fill text-primary">favorite</span>
+                                                        <span className="text-[9px] font-bold text-primary uppercase tracking-widest">O Autor Amou</span>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {isAuthor && (
+                                                <button
+                                                    onClick={() => handleLove(comment.id, !!comment.author_loved)}
+                                                    className={`flex items-center gap-1.5 text-xs font-bold transition-all opacity-0 group-hover:opacity-100 ${comment.author_loved ? 'text-primary' : 'text-slate-300 hover:text-primary'}`}
+                                                    title="Marcar com 'Amei'"
+                                                >
+                                                    <span className={`material-symbols-outlined text-[18px] ${comment.author_loved ? 'font-variation-fill' : ''}`}>favorite</span>
+                                                </button>
                                             )}
                                         </div>
-
-                                        {isAuthor && (
-                                            <button
-                                                onClick={() => handleLove(comment.id, !!comment.author_loved)}
-                                                className={`flex items-center gap-1.5 text-xs font-bold transition-all opacity-0 group-hover:opacity-100 ${comment.author_loved ? 'text-primary' : 'text-slate-300 hover:text-primary'}`}
-                                                title="Marcar com 'Amei'"
-                                            >
-                                                <span className={`material-symbols-outlined text-[18px] ${comment.author_loved ? 'font-variation-fill' : ''}`}>favorite</span>
-                                            </button>
-                                        )}
                                     </div>
                                 </div>
+
+                                {/* Respostas */}
+                                {comments.filter(c => c.parent_id === comment.id).length > 0 && (
+                                    <div className="mt-4 ml-8 sm:ml-14 space-y-4 relative before:absolute before:inset-y-0 before:-left-6 before:w-[2px] before:bg-slate-100 dark:before:bg-slate-800 before:rounded-full">
+                                        {comments.filter(c => c.parent_id === comment.id).map(reply => (
+                                            <div key={reply.id} className="flex gap-3 animate-in fade-in duration-500 relative">
+                                                <div className="absolute top-5 -left-6 w-4 h-[2px] bg-slate-100 dark:bg-slate-800"></div>
+                                                <div className="hidden sm:flex size-8 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 items-center justify-center shrink-0 overflow-hidden">
+                                                    <img
+                                                        src={`https://ui-avatars.com/api/?name=${reply.user_name}&background=random`}
+                                                        alt="Avatar"
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                </div>
+                                                <div className="flex-1 bg-white dark:bg-card-dark rounded-xl p-4 shadow-sm border border-slate-100 dark:border-slate-800 relative group text-sm">
+                                                    <div className="flex items-baseline justify-between mb-2">
+                                                        <h4 className="font-bold text-xs text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                                                            {reply.user_name}
+                                                            {isAuthor && reply.user_id === user?.id && (
+                                                                <span className="material-symbols-outlined text-primary text-[12px] leading-none" title="Autor">verified</span>
+                                                            )}
+                                                        </h4>
+                                                        <span className="text-[9px] text-slate-400 font-medium">{formatDate(reply.created_at)}</span>
+                                                    </div>
+                                                    <p className="text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-wrap mb-3 text-xs">
+                                                        {reply.content}
+                                                    </p>
+                                                    <div className="flex items-center gap-4 justify-between">
+                                                        <div className="flex items-center gap-4">
+                                                            <button
+                                                                onClick={() => handleLike(reply.id, reply.likes || [])}
+                                                                disabled={!user}
+                                                                className={`flex items-center gap-1 text-[10px] font-bold transition-all ${reply.likes?.includes(user?.id || '') ? 'text-primary' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'} ${!user && 'opacity-50 cursor-not-allowed'}`}
+                                                            >
+                                                                <span className={`material-symbols-outlined text-[14px] ${reply.likes?.includes(user?.id || '') ? 'font-variation-fill' : ''}`}>thumb_up</span>
+                                                                {reply.likes?.length || 0}
+                                                            </button>
+                                                            {reply.author_loved && (
+                                                                <div className="flex items-center gap-1 px-1.5 py-0.5 bg-primary/5 rounded-full border border-primary/10">
+                                                                    <span className="material-symbols-outlined text-[10px] font-variation-fill text-primary">favorite</span>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        {isAuthor && (
+                                                            <button
+                                                                onClick={() => handleLove(reply.id, !!reply.author_loved)}
+                                                                className={`flex items-center gap-1.5 text-xs font-bold transition-all opacity-0 group-hover:opacity-100 ${reply.author_loved ? 'text-primary' : 'text-slate-300 hover:text-primary'}`}
+                                                                title="Marcar com 'Amei'"
+                                                            >
+                                                                <span className={`material-symbols-outlined text-[14px] ${reply.author_loved ? 'font-variation-fill' : ''}`}>favorite</span>
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {/* Form de Resposta */}
+                                {replyingTo === comment.id && (
+                                    <div className="mt-4 ml-8 sm:ml-14 animate-in slide-in-from-top-2 fade-in duration-200">
+                                        <form onSubmit={(e) => handleReplySubmit(e, comment.id)}>
+                                            <div className="flex items-start gap-3">
+                                                <div className="hidden sm:flex size-8 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 items-center justify-center shrink-0 overflow-hidden">
+                                                    <img
+                                                        src={user?.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${user?.user_metadata?.full_name || 'User'}&background=random`}
+                                                        alt="Avatar"
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <textarea
+                                                        required
+                                                        rows={2}
+                                                        placeholder="Escreva sua resposta..."
+                                                        className="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-lg p-3 focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition-all outline-none text-xs resize-none"
+                                                        value={replyContent}
+                                                        onChange={(e) => setReplyContent(e.target.value)}
+                                                        disabled={submitting}
+                                                    ></textarea>
+                                                    <div className="flex justify-end gap-2 mt-2">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                setReplyingTo(null);
+                                                                setReplyContent('');
+                                                            }}
+                                                            className="px-4 py-1.5 text-xs font-bold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-all uppercase tracking-wider"
+                                                            disabled={submitting}
+                                                        >
+                                                            Cancelar
+                                                        </button>
+                                                        <button
+                                                            type="submit"
+                                                            disabled={submitting || !replyContent.trim()}
+                                                            className="flex items-center gap-1.5 px-4 py-1.5 bg-primary text-white font-bold rounded-lg hover:brightness-110 transition-all text-xs uppercase tracking-widest disabled:opacity-50 shadow-md shadow-primary/20"
+                                                        >
+                                                            {submitting ? (
+                                                                <span className="material-symbols-outlined animate-spin text-[14px]">sync</span>
+                                                            ) : (
+                                                                <>
+                                                                    <span className="material-symbols-outlined text-[14px]">send</span> Enviar
+                                                                </>
+                                                            )}
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                )}
                             </div>
                         ))}
                     </div>
