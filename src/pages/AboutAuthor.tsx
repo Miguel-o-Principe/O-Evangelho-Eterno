@@ -93,7 +93,7 @@ export const AboutAuthor = () => {
                             Diferente do que muitos podem imaginar, este livro não nasceu em jardins de facilidade. Ele foi forjado no fogo. Minha escrita é o resultado de um diálogo constante entre as minhas maiores dores e a graça que insiste em me sustentar.
                         </p>
                         <p>
-                            Eu sei, com toda a clareza, que não sei se sou a melhor pessoa para falar sobre o Evangelho. Não sou um exemplo de perfeição, nem alguém isento de cicatrizes ou dúvidas. Se a escolha dependesse de méritos humanos, eu certamente estaria no fim da fila.
+                            Eu sei, com toda a clareza, que não sou a melhor pessoa para falar sobre o Evangelho. Não sou um exemplo de perfeição, nem alguém isento de cicatrizes ou dúvidas. Se a escolha dependesse de méritos humanos, eu certamente estaria no fim da fila.
                         </p>
                     </div>
                     <div className="p-10 bg-white dark:bg-card-dark rounded-[2rem] border border-slate-100 dark:border-slate-800 italic text-slate-800 dark:text-slate-100 shadow-sm relative">
