@@ -6,6 +6,7 @@ interface Comment {
     id: string;
     chapter_id: string;
     user_name: string;
+    avatar_url?: string | null;
     content: string;
     created_at: string;
     user_id: string;
@@ -106,6 +107,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                         chapter_id: chapterId,
                         user_id: user.id,
                         user_name: user.user_metadata?.full_name || 'Usuário do Portal',
+                        avatar_url: user.user_metadata?.avatar_url || null,
                         content: newComment.trim(),
                         parent_id: null
                     }
@@ -144,6 +146,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                         chapter_id: chapterId,
                         user_id: user.id,
                         user_name: user.user_metadata?.full_name || 'Usuário do Portal',
+                        avatar_url: user.user_metadata?.avatar_url || null,
                         content: replyContent.trim(),
                         parent_id: parentId
                     }
@@ -175,7 +178,10 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
     const isAuthor = user?.email === 'smashertx@gmail.com';
 
     const handleLike = async (commentId: string, currentLikes: string[]) => {
-        if (!user) return;
+        if (!session || !user) {
+            alert('Para curtir os comentários, você precisa fazer login no portal.');
+            return;
+        }
 
         const hasLiked = currentLikes?.includes(user.id);
         const newLikes = hasLiked
@@ -310,7 +316,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                                 <div className="flex gap-4">
                                     <div className="hidden sm:flex size-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 items-center justify-center shrink-0 overflow-hidden">
                                         <img
-                                            src={`https://ui-avatars.com/api/?name=${comment.user_name}&background=random`}
+                                            src={comment.avatar_url || `https://ui-avatars.com/api/?name=${comment.user_name}&background=random`}
                                             alt="Avatar"
                                             className="w-full h-full object-cover"
                                         />
@@ -336,8 +342,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                                             <div className="flex items-center gap-4">
                                                 <button
                                                     onClick={() => handleLike(comment.id, comment.likes || [])}
-                                                    disabled={!user}
-                                                    className={`flex items-center gap-1.5 text-xs font-bold transition-all ${comment.likes?.includes(user?.id || '') ? 'text-primary' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'} ${!user && 'opacity-50 cursor-not-allowed'}`}
+                                                    className={`flex items-center gap-1.5 text-xs font-bold transition-all ${comment.likes?.includes(user?.id || '') ? 'text-primary' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'}`}
                                                 >
                                                     <span className={`material-symbols-outlined text-[18px] ${comment.likes?.includes(user?.id || '') ? 'font-variation-fill' : ''}`}>thumb_up</span>
                                                     {comment.likes?.length || 0}
@@ -345,6 +350,10 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
 
                                                 <button
                                                     onClick={() => {
+                                                        if (!session) {
+                                                            alert('Para responder a este comentário, você precisa fazer login no portal.');
+                                                            return;
+                                                        }
                                                         setReplyingTo(replyingTo === comment.id ? null : comment.id);
                                                         setReplyContent('');
                                                     }}
@@ -383,7 +392,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                                                 <div className="absolute top-5 -left-6 w-4 h-[2px] bg-slate-100 dark:bg-slate-800"></div>
                                                 <div className="hidden sm:flex size-8 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 items-center justify-center shrink-0 overflow-hidden">
                                                     <img
-                                                        src={`https://ui-avatars.com/api/?name=${reply.user_name}&background=random`}
+                                                        src={reply.avatar_url || `https://ui-avatars.com/api/?name=${reply.user_name}&background=random`}
                                                         alt="Avatar"
                                                         className="w-full h-full object-cover"
                                                     />
@@ -405,8 +414,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                                                         <div className="flex items-center gap-4">
                                                             <button
                                                                 onClick={() => handleLike(reply.id, reply.likes || [])}
-                                                                disabled={!user}
-                                                                className={`flex items-center gap-1 text-[10px] font-bold transition-all ${reply.likes?.includes(user?.id || '') ? 'text-primary' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'} ${!user && 'opacity-50 cursor-not-allowed'}`}
+                                                                className={`flex items-center gap-1 text-[10px] font-bold transition-all ${reply.likes?.includes(user?.id || '') ? 'text-primary' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'}`}
                                                             >
                                                                 <span className={`material-symbols-outlined text-[14px] ${reply.likes?.includes(user?.id || '') ? 'font-variation-fill' : ''}`}>thumb_up</span>
                                                                 {reply.likes?.length || 0}
