@@ -1,0 +1,493 @@
+﻿commit fcd7805bd041fe422ec6beca00e108b7ff3b5893
+Author: Miguel-o-Principe <smashertx@gmail.com>
+Date:   Mon Mar 9 19:26:03 2026 -0300
+
+    feat: Add an interactive comment section with real-time updates and integrate it into the About Book page.
+
+diff --git a/src/pages/AboutBook.tsx b/src/pages/AboutBook.tsx
+index b41c631..408eab6 100644
+--- a/src/pages/AboutBook.tsx
++++ b/src/pages/AboutBook.tsx
+@@ -213,19 +213,48 @@ export const AboutBook = () => {
+             </section>
+ 
+             {/* Conclus├úo */}
+-            <section className="mt-20 p-10 bg-white dark:bg-card-dark rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl relative overflow-hidden text-center lg:text-left">
++            <section className="mt-20 p-10 bg-white dark:bg-card-dark rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl relative overflow-hidden">
+                 <div className="absolute top-0 left-0 w-full h-2 bg-primary"></div>
+-                <h2 className="text-3xl font-bold mb-8 italic">V. Conclus├úo: O Fim do Teatro Religioso</h2>
+-                <div className="space-y-6 font-light leading-relaxed text-lg text-slate-600 dark:text-slate-400">
+-                    <p>
+-                        O livro convida o leitor a abandonar o papel de &quot;Ad├úo Performativo&quot; e aceitar a nudez da filia├º├úo. A arquitetura da obra revela que o universo n├úo ├® um palco de testes morais, mas um cen├írio constru├¡do ao redor da Cruz.
+-                    </p>
+-                    <p>
+-                        A vida no tempo ├® apenas o processo de despertar para essa realidade consumada. O convite de <strong>Miguel, o Pr├¡ncipe</strong>, ├® para que o homem saia da neurose e entre no descanso de quem descobriu que a &quot;Espada de Fogo&quot; j├í se apagou no peito de Jesus.
+-                    </p>
+-                    <p className="font-bold text-slate-900 dark:text-white mt-10 text-xl">
+-                        O Evangelho n├úo ├® uma nova religi├úo, mas o fim de todas elas.
+-                    </p>
++                <div className="flex flex-col lg:flex-row gap-12 items-center justify-between">
++                    <div className="flex-1 text-center lg:text-left">
++                        <h2 className="text-3xl font-bold mb-8 italic">V. Conclus├úo: O Fim do Teatro Religioso</h2>
++                        <div className="space-y-6 font-light leading-relaxed text-lg text-slate-600 dark:text-slate-400">
++                            <p>
++                                O livro convida o leitor a abandonar o papel de &quot;Ad├úo Performativo&quot; e aceitar a nudez da filia├º├úo. A arquitetura da obra revela que o universo n├úo ├® um palco de testes morais, mas um cen├írio constru├¡do ao redor da Cruz.
++                            </p>
++                            <p>
++                                A vida no tempo ├® apenas o processo de despertar para essa realidade consumada. O convite de <strong>Miguel, o Pr├¡ncipe</strong>, ├® para que o homem saia da neurose e entre no descanso de quem descobriu que a &quot;Espada de Fogo&quot; j├í se apagou no peito de Jesus.
++                            </p>
++                            <p className="font-bold text-slate-900 dark:text-white mt-10 text-xl">
++                                O Evangelho n├úo ├® uma nova religi├úo, mas o fim de todas elas.
++                            </p>
++                        </div>
++                    </div>
++
++                    {/* QR Code Amazon Box */}
++                    <div className="flex flex-col items-center justify-center p-8 bg-slate-50 dark:bg-slate-900/50 rounded-3xl border border-slate-100 dark:border-slate-800 shrink-0 w-full sm:w-auto mt-8 lg:mt-0 relative overflow-hidden group">
++                        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
++                        <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-primary mb-6 text-center">Adquira a Obra</h3>
++
++                        <div className="bg-white p-3 rounded-2xl shadow-sm mb-6 border border-slate-100 relative z-10 transition-transform duration-300 group-hover:scale-105 group-hover:shadow-xl group-hover:shadow-primary/20">
++                            <img
++                                src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://www.amazon.com.br/dp/B0GM8HTQF4&margin=2"
++                                alt="QR Code Amazon"
++                                className="w-32 h-32 md:w-40 md:h-40"
++                            />
++                        </div>
++
++                        <a
++                            href="https://www.amazon.com.br/dp/B0GM8HTQF4"
++                            target="_blank"
++                            rel="noopener noreferrer"
++                            className="relative z-10 flex items-center gap-2 px-8 py-4 bg-primary text-white font-bold rounded-xl hover:brightness-110 transition-all text-xs uppercase tracking-[0.2em] shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-1"
++                        >
++                            <span className="material-symbols-outlined text-lg">shopping_cart</span>
++                            Amazon.com.br
++                        </a>
++                        <p className="text-[10px] text-slate-400 mt-4 text-center font-medium">Aponte a c├ómera do celular<br />para comprar o e-book ou f├¡sico</p>
++                    </div>
+                 </div>
+             </section>
+         </main>
+
+commit f0002401620737b964825bc6ffd20c4ad89a6a3b
+Author: Miguel-o-Principe <smashertx@gmail.com>
+Date:   Sun Mar 8 20:39:08 2026 -0300
+
+    feat: Add new AboutBook page with a detailed interdisciplinary analysis of the book.
+
+diff --git a/src/pages/AboutBook.tsx b/src/pages/AboutBook.tsx
+index 03e8015..b41c631 100644
+--- a/src/pages/AboutBook.tsx
++++ b/src/pages/AboutBook.tsx
+@@ -2,7 +2,7 @@ import React from 'react';
+ 
+ export const AboutBook = () => {
+     return (
+-        <main className="max-w-4xl mx-auto px-4 sm:px-6 py-12 lg:py-24 fade-up">
++        <main className="w-full max-w-4xl mx-auto px-4 sm:px-6 py-12 lg:py-24 fade-up overflow-hidden">
+             <style>{`
+                 .text-gradient {
+                     background: linear-gradient(to right, #ec1337, #ff4d6d);
+@@ -51,8 +51,8 @@ export const AboutBook = () => {
+                     <h3 className="text-xl font-bold mt-8">O Significado do &quot;N├úo&quot; e a Inven├º├úo do Pecado</h3>
+                     <p>Na vis├úo do autor, o desejo humano n├úo precede a proibi├º├úo; ao contr├írio, a Lei inaugura o Desejo ao demarcar o territ├│rio do proibido. O desejo de Eva pelo fruto n├úo nasce de uma fome biol├│gica, mas de uma voracidade simb├│lica gerada pela interdi├º├úo.</p>
+ 
+-                    <div className="overflow-x-auto rounded-2xl border border-slate-100 dark:border-white/5 bg-white dark:bg-card-dark my-8 shadow-lg">
+-                        <table className="w-full text-left border-collapse min-w-max">
++                    <div className="w-full max-w-full overflow-x-auto rounded-2xl border border-slate-100 dark:border-white/5 bg-white dark:bg-card-dark my-8 shadow-lg">
++                        <table className="w-full text-left border-collapse min-w-[600px] whitespace-nowrap">
+                             <thead>
+                                 <tr>
+                                     <th className="p-4 text-xs uppercase tracking-widest border-b border-slate-100 dark:border-white/10 dark:text-primary">Conceito Lacaniano</th>
+@@ -95,8 +95,8 @@ export const AboutBook = () => {
+                 <div className="space-y-6 font-light leading-relaxed">
+                     <p>O autor prop├Áe uma separa├º├úo cir├║rgica entre o &quot;Deus da Lei&quot; e o &quot;Pai da Gra├ºa&quot;. Uma das teses mais provocativas ├® que a intera├º├úo de Israel foi mediada exclusivamente por anjos, seres funcionais e amorais que operam pela l├│gica da retribui├º├úo estrita.</p>
+ 
+-                    <div className="overflow-x-auto rounded-2xl border border-slate-100 dark:border-white/5 bg-white dark:bg-card-dark my-8 shadow-lg">
+-                        <table className="w-full text-left border-collapse min-w-max">
++                    <div className="w-full max-w-full overflow-x-auto rounded-2xl border border-slate-100 dark:border-white/5 bg-white dark:bg-card-dark my-8 shadow-lg">
++                        <table className="w-full text-left border-collapse min-w-[600px] whitespace-nowrap">
+                             <thead>
+                                 <tr>
+                                     <th className="p-4 text-xs uppercase tracking-widest border-b border-slate-100 dark:border-white/10 dark:text-primary">Personagem</th>
+@@ -139,8 +139,8 @@ export const AboutBook = () => {
+                 <div className="space-y-6 font-light leading-relaxed">
+                     <p>A premissa cosmol├│gica mais radical da obra ├® a de que a Cruz de Cristo ├® a &quot;Causa Primeira&quot; da cria├º├úo. O universo tomou &quot;vida emprestada&quot; da morte futura de Cristo atrav├®s do princ├¡pio da <strong>retrocausalidade</strong>.</p>
+ 
+-                    <div className="overflow-x-auto rounded-2xl border border-slate-100 dark:border-white/5 bg-white dark:bg-card-dark my-8 shadow-lg">
+-                        <table className="w-full text-left border-collapse min-w-max">
++                    <div className="w-full max-w-full overflow-x-auto rounded-2xl border border-slate-100 dark:border-white/5 bg-white dark:bg-card-dark my-8 shadow-lg">
++                        <table className="w-full text-left border-collapse min-w-[600px] whitespace-nowrap">
+                             <thead>
+                                 <tr>
+                                     <th className="p-4 text-xs uppercase tracking-widest border-b border-slate-100 dark:border-white/10 dark:text-primary">Dimens├úo Temporal</th>
+@@ -181,8 +181,8 @@ export const AboutBook = () => {
+                 <div className="space-y-6 font-light leading-relaxed">
+                     <p>O autor prop├Áe um <strong>&quot;Ate├¡smo Crist├úo&quot;</strong> em rela├º├úo ao Deus da Lei como o ├║nico caminho para a f├® aut├¬ntica. A Cruz ├® o funeral da religi├úo burocr├ítica, onde o Juiz morreu para salvar o r├®u.</p>
+ 
+-                    <div className="overflow-x-auto rounded-2xl border border-slate-100 dark:border-white/5 bg-white dark:bg-card-dark my-8 shadow-lg">
+-                        <table className="w-full text-left border-collapse min-w-max">
++                    <div className="w-full max-w-full overflow-x-auto rounded-2xl border border-slate-100 dark:border-white/5 bg-white dark:bg-card-dark my-8 shadow-lg">
++                        <table className="w-full text-left border-collapse min-w-[600px] whitespace-nowrap">
+                             <thead>
+                                 <tr>
+                                     <th className="p-4 text-xs uppercase tracking-widest border-b border-slate-100 dark:border-white/10 dark:text-primary">Conceito Filos├│fico</th>
+
+commit 4c2157dabd527d570831196f33d0c4a5f9eda7a2
+Author: Miguel-o-Principe <smashertx@gmail.com>
+Date:   Sun Mar 8 20:35:04 2026 -0300
+
+    feat: Add AboutBook page component displaying an interdisciplinary analysis of "O Evangelho Eterno".
+
+diff --git a/src/pages/AboutBook.tsx b/src/pages/AboutBook.tsx
+index aa00c65..03e8015 100644
+--- a/src/pages/AboutBook.tsx
++++ b/src/pages/AboutBook.tsx
+@@ -2,7 +2,7 @@ import React from 'react';
+ 
+ export const AboutBook = () => {
+     return (
+-        <main className="max-w-4xl mx-auto px-4 sm:px-6 py-12 lg:py-24 fade-up break-words">
++        <main className="max-w-4xl mx-auto px-4 sm:px-6 py-12 lg:py-24 fade-up">
+             <style>{`
+                 .text-gradient {
+                     background: linear-gradient(to right, #ec1337, #ff4d6d);
+@@ -52,7 +52,7 @@ export const AboutBook = () => {
+                     <p>Na vis├úo do autor, o desejo humano n├úo precede a proibi├º├úo; ao contr├írio, a Lei inaugura o Desejo ao demarcar o territ├│rio do proibido. O desejo de Eva pelo fruto n├úo nasce de uma fome biol├│gica, mas de uma voracidade simb├│lica gerada pela interdi├º├úo.</p>
+ 
+                     <div className="overflow-x-auto rounded-2xl border border-slate-100 dark:border-white/5 bg-white dark:bg-card-dark my-8 shadow-lg">
+-                        <table className="w-full text-left border-collapse min-w-[600px]">
++                        <table className="w-full text-left border-collapse min-w-max">
+                             <thead>
+                                 <tr>
+                                     <th className="p-4 text-xs uppercase tracking-widest border-b border-slate-100 dark:border-white/10 dark:text-primary">Conceito Lacaniano</th>
+@@ -96,7 +96,7 @@ export const AboutBook = () => {
+                     <p>O autor prop├Áe uma separa├º├úo cir├║rgica entre o &quot;Deus da Lei&quot; e o &quot;Pai da Gra├ºa&quot;. Uma das teses mais provocativas ├® que a intera├º├úo de Israel foi mediada exclusivamente por anjos, seres funcionais e amorais que operam pela l├│gica da retribui├º├úo estrita.</p>
+ 
+                     <div className="overflow-x-auto rounded-2xl border border-slate-100 dark:border-white/5 bg-white dark:bg-card-dark my-8 shadow-lg">
+-                        <table className="w-full text-left border-collapse min-w-[600px]">
++                        <table className="w-full text-left border-collapse min-w-max">
+                             <thead>
+                                 <tr>
+                                     <th className="p-4 text-xs uppercase tracking-widest border-b border-slate-100 dark:border-white/10 dark:text-primary">Personagem</th>
+@@ -140,7 +140,7 @@ export const AboutBook = () => {
+                     <p>A premissa cosmol├│gica mais radical da obra ├® a de que a Cruz de Cristo ├® a &quot;Causa Primeira&quot; da cria├º├úo. O universo tomou &quot;vida emprestada&quot; da morte futura de Cristo atrav├®s do princ├¡pio da <strong>retrocausalidade</strong>.</p>
+ 
+                     <div className="overflow-x-auto rounded-2xl border border-slate-100 dark:border-white/5 bg-white dark:bg-card-dark my-8 shadow-lg">
+-                        <table className="w-full text-left border-collapse min-w-[600px]">
++                        <table className="w-full text-left border-collapse min-w-max">
+                             <thead>
+                                 <tr>
+                                     <th className="p-4 text-xs uppercase tracking-widest border-b border-slate-100 dark:border-white/10 dark:text-primary">Dimens├úo Temporal</th>
+@@ -182,7 +182,7 @@ export const AboutBook = () => {
+                     <p>O autor prop├Áe um <strong>&quot;Ate├¡smo Crist├úo&quot;</strong> em rela├º├úo ao Deus da Lei como o ├║nico caminho para a f├® aut├¬ntica. A Cruz ├® o funeral da religi├úo burocr├ítica, onde o Juiz morreu para salvar o r├®u.</p>
+ 
+                     <div className="overflow-x-auto rounded-2xl border border-slate-100 dark:border-white/5 bg-white dark:bg-card-dark my-8 shadow-lg">
+-                        <table className="w-full text-left border-collapse min-w-[600px]">
++                        <table className="w-full text-left border-collapse min-w-max">
+                             <thead>
+                                 <tr>
+                                     <th className="p-4 text-xs uppercase tracking-widest border-b border-slate-100 dark:border-white/10 dark:text-primary">Conceito Filos├│fico</th>
+
+commit a45712e1406e511fbc1b7fd81acac469c8d0afc9
+Author: Miguel-o-Principe <smashertx@gmail.com>
+Date:   Sun Mar 8 20:31:01 2026 -0300
+
+    feat: Add new page for the interdisciplinary analysis of 'O Evangelho Eterno e a Ci├¬ncia da Gra├ºa'.
+
+diff --git a/src/pages/AboutBook.tsx b/src/pages/AboutBook.tsx
+index 59de78d..aa00c65 100644
+--- a/src/pages/AboutBook.tsx
++++ b/src/pages/AboutBook.tsx
+@@ -2,7 +2,7 @@ import React from 'react';
+ 
+ export const AboutBook = () => {
+     return (
+-        <main className="max-w-4xl mx-auto px-6 py-12 lg:py-24 fade-up">
++        <main className="max-w-4xl mx-auto px-4 sm:px-6 py-12 lg:py-24 fade-up break-words">
+             <style>{`
+                 .text-gradient {
+                     background: linear-gradient(to right, #ec1337, #ff4d6d);
+@@ -52,7 +52,7 @@ export const AboutBook = () => {
+                     <p>Na vis├úo do autor, o desejo humano n├úo precede a proibi├º├úo; ao contr├írio, a Lei inaugura o Desejo ao demarcar o territ├│rio do proibido. O desejo de Eva pelo fruto n├úo nasce de uma fome biol├│gica, mas de uma voracidade simb├│lica gerada pela interdi├º├úo.</p>
+ 
+                     <div className="overflow-x-auto rounded-2xl border border-slate-100 dark:border-white/5 bg-white dark:bg-card-dark my-8 shadow-lg">
+-                        <table className="w-full text-left border-collapse">
++                        <table className="w-full text-left border-collapse min-w-[600px]">
+                             <thead>
+                                 <tr>
+                                     <th className="p-4 text-xs uppercase tracking-widest border-b border-slate-100 dark:border-white/10 dark:text-primary">Conceito Lacaniano</th>
+@@ -96,7 +96,7 @@ export const AboutBook = () => {
+                     <p>O autor prop├Áe uma separa├º├úo cir├║rgica entre o &quot;Deus da Lei&quot; e o &quot;Pai da Gra├ºa&quot;. Uma das teses mais provocativas ├® que a intera├º├úo de Israel foi mediada exclusivamente por anjos, seres funcionais e amorais que operam pela l├│gica da retribui├º├úo estrita.</p>
+ 
+                     <div className="overflow-x-auto rounded-2xl border border-slate-100 dark:border-white/5 bg-white dark:bg-card-dark my-8 shadow-lg">
+-                        <table className="w-full text-left border-collapse">
++                        <table className="w-full text-left border-collapse min-w-[600px]">
+                             <thead>
+                                 <tr>
+                                     <th className="p-4 text-xs uppercase tracking-widest border-b border-slate-100 dark:border-white/10 dark:text-primary">Personagem</th>
+@@ -140,7 +140,7 @@ export const AboutBook = () => {
+                     <p>A premissa cosmol├│gica mais radical da obra ├® a de que a Cruz de Cristo ├® a &quot;Causa Primeira&quot; da cria├º├úo. O universo tomou &quot;vida emprestada&quot; da morte futura de Cristo atrav├®s do princ├¡pio da <strong>retrocausalidade</strong>.</p>
+ 
+                     <div className="overflow-x-auto rounded-2xl border border-slate-100 dark:border-white/5 bg-white dark:bg-card-dark my-8 shadow-lg">
+-                        <table className="w-full text-left border-collapse">
++                        <table className="w-full text-left border-collapse min-w-[600px]">
+                             <thead>
+                                 <tr>
+                                     <th className="p-4 text-xs uppercase tracking-widest border-b border-slate-100 dark:border-white/10 dark:text-primary">Dimens├úo Temporal</th>
+@@ -182,7 +182,7 @@ export const AboutBook = () => {
+                     <p>O autor prop├Áe um <strong>&quot;Ate├¡smo Crist├úo&quot;</strong> em rela├º├úo ao Deus da Lei como o ├║nico caminho para a f├® aut├¬ntica. A Cruz ├® o funeral da religi├úo burocr├ítica, onde o Juiz morreu para salvar o r├®u.</p>
+ 
+                     <div className="overflow-x-auto rounded-2xl border border-slate-100 dark:border-white/5 bg-white dark:bg-card-dark my-8 shadow-lg">
+-                        <table className="w-full text-left border-collapse">
++                        <table className="w-full text-left border-collapse min-w-[600px]">
+                             <thead>
+                                 <tr>
+                                     <th className="p-4 text-xs uppercase tracking-widest border-b border-slate-100 dark:border-white/10 dark:text-primary">Conceito Filos├│fico</th>
+
+commit 784d4c0b2622f5070ec04679d5fca91d067ca4cb
+Author: Miguel-o-Principe <smashertx@gmail.com>
+Date:   Sun Mar 8 19:46:43 2026 -0300
+
+    01
+
+diff --git a/src/pages/AboutBook.tsx b/src/pages/AboutBook.tsx
+new file mode 100644
+index 0000000..59de78d
+--- /dev/null
++++ b/src/pages/AboutBook.tsx
+@@ -0,0 +1,233 @@
++import React from 'react';
++
++export const AboutBook = () => {
++    return (
++        <main className="max-w-4xl mx-auto px-6 py-12 lg:py-24 fade-up">
++            <style>{`
++                .text-gradient {
++                    background: linear-gradient(to right, #ec1337, #ff4d6d);
++                    -webkit-background-clip: text;
++                    -webkit-text-fill-color: transparent;
++                }
++                .fade-up { animation: fadeUp 1s ease-out forwards; }
++                @keyframes fadeUp {
++                    from { opacity: 0; transform: translateY(20px); }
++                    to { opacity: 1; transform: translateY(0); }
++                }
++            `}</style>
++
++            {/* Header da An├ílise */}
++            <header className="mb-20 text-center lg:text-left">
++                <h6 className="text-primary font-bold uppercase tracking-[0.3em] text-[10px] mb-4">An├ílise Interdisciplinar</h6>
++                <h1 className="text-3xl sm:text-5xl font-bold leading-tight mb-8 italic">
++                    O Evangelho Eterno e a Ci├¬ncia da Gra├ºa: <span className="text-gradient">Uma An├ílise da Obra de Miguel, o Pr├¡ncipe</span>
++                </h1>
++
++                <div className="flex flex-col lg:flex-row gap-10 items-center lg:items-start mt-12 text-left">
++                    <div className="w-full lg:w-2/3 space-y-6 text-lg font-light leading-relaxed">
++                        <p>
++                            A obra intitulada <strong>O Evangelho Eterno e a Arquitetura da Gra├ºa</strong>, de autoria de <strong>Miguel, o Pr├¡ncipe</strong>, representa um esfor├ºo intelectual singular na literatura teol├│gica e filos├│fica contempor├ónea.
++                        </p>
++                        <p>
++                            Longe de ser um manual de conduta moral ou uma exegese b├¡blica tradicional, o texto prop├Áe uma desconstru├º├úo radical do fen├┤meno religioso atrav├®s de uma s├¡ntese rigorosa entre quatro pilares do conhecimento humano: a <strong>Psican├ílise Lacaniana</strong>, a <strong>Teologia B├¡blica</strong>, a <strong>Cosmologia Qu├óntica</strong> e a <strong>Filosofia Existencialista</strong>.
++                        </p>
++                    </div>
++                    <div className="w-48 lg:w-1/3 shrink-0">
++                        <img src="/images/livro-3d.png" alt="Capa do Livro" className="w-full rounded-xl shadow-2xl rotate-2 hover:rotate-0 transition-transform duration-500" />
++                    </div>
++                </div>
++
++                <div className="mt-8 p-8 bg-primary/5 dark:bg-primary/10 rounded-2xl border border-primary/10 italic text-slate-600 dark:text-slate-400 text-lg">
++                    &quot;A tese central do autor ├® a de que a Gra├ºa n├úo ├® um sentimento divino benevolente, mas uma 'Gra├ºa Estrutural', uma lei fundamental da realidade, compar├ível em sua solidez e amoralidade ├ás leis da f├¡sica, como a gravidade.&quot;
++                </div>
++            </header>
++
++            {/* Se├º├úo I */}
++            <section className="mb-12 pl-6 border-l border-primary/10 dark:border-primary/20">
++                <h2 className="text-2xl font-bold mb-6 italic text-primary">I. A Funda├º├úo Psicanal├¡tica: A Topografia do Desejo</h2>
++                <div className="space-y-6 font-light leading-relaxed">
++                    <p>O autor utiliza a psican├ílise, especialmente a vertente lacaniana, como a ferramenta diagn├│stica prim├íria para mapear a constitui├º├úo do sujeito humano a partir do evento simb├│lico da Queda. O Jardim do ├ëden ├® apresentado como o estado de unidade pr├®-simb├│lica, onde o ser e o fazer eram indivis├¡veis.</p>
++
++                    <h3 className="text-xl font-bold mt-8">O Significado do &quot;N├úo&quot; e a Inven├º├úo do Pecado</h3>
++                    <p>Na vis├úo do autor, o desejo humano n├úo precede a proibi├º├úo; ao contr├írio, a Lei inaugura o Desejo ao demarcar o territ├│rio do proibido. O desejo de Eva pelo fruto n├úo nasce de uma fome biol├│gica, mas de uma voracidade simb├│lica gerada pela interdi├º├úo.</p>
++
++                    <div className="overflow-x-auto rounded-2xl border border-slate-100 dark:border-white/5 bg-white dark:bg-card-dark my-8 shadow-lg">
++                        <table className="w-full text-left border-collapse">
++                            <thead>
++                                <tr>
++                                    <th className="p-4 text-xs uppercase tracking-widest border-b border-slate-100 dark:border-white/10 dark:text-primary">Conceito Lacaniano</th>
++                                    <th className="p-4 text-xs uppercase tracking-widest border-b border-slate-100 dark:border-white/10 dark:text-primary">Aplica├º├úo na Obra</th>
++                                    <th className="p-4 text-xs uppercase tracking-widest border-b border-slate-100 dark:border-white/10 dark:text-primary">Implica├º├úo no Sujeito</th>
++                                </tr>
++                            </thead>
++                            <tbody>
++                                <tr>
++                                    <td className="p-4 border-b border-slate-50 dark:border-white/5 font-bold text-sm">A Falta (Manque)</td>
++                                    <td className="p-4 border-b border-slate-50 dark:border-white/5 text-sm">O estado do homem ap├│s a Queda.</td>
++                                    <td className="p-4 border-b border-slate-50 dark:border-white/5 text-sm">O desejo busca preencher o vazio da unidade perdida.</td>
++                                </tr>
++                                <tr>
++                                    <td className="p-4 border-b border-slate-50 dark:border-white/5 font-bold text-sm">Ordem Simb├│lica</td>
++                                    <td className="p-4 border-b border-slate-50 dark:border-white/5 text-sm">A Lei e a Linguagem no ├ëden.</td>
++                                    <td className="p-4 border-b border-slate-50 dark:border-white/5 text-sm">O sujeito passa a ser mediado pela cultura e moral.</td>
++                                </tr>
++                                <tr>
++                                    <td className="p-4 border-b border-slate-50 dark:border-white/5 font-bold text-sm">Grande Outro</td>
++                                    <td className="p-4 border-b border-slate-50 dark:border-white/5 text-sm">O &quot;Deus da Lei&quot; (Mediador Ang├®lico).</td>
++                                    <td className="p-4 border-b border-slate-50 dark:border-white/5 text-sm">A inst├óncia que observa e julga a performance.</td>
++                                </tr>
++                                <tr>
++                                    <td className="p-4 font-bold text-sm">Objeto Pequeno a</td>
++                                    <td className="p-4 text-sm">O Fruto Proibido / O Pecado.</td>
++                                    <td className="p-4 text-sm">O objeto que causa desejo mas nunca satisfaz.</td>
++                                </tr>
++                            </tbody>
++                        </table>
++                    </div>
++
++                    <p>O autor argumenta que incorporar o Conhecimento do Bem e do Mal faz com que Ad├úo deixe de ser um sujeito aut├¬ntico para se tornar um <strong>&quot;Ator de si mesmo&quot;</strong> (Ad├úo Performativo), cobrindo seu abismo interior com &quot;folhas de figueira&quot; ÔÇö a met├ífora para a moralidade religiosa.</p>
++                </div>
++            </section>
++
++            {/* Se├º├úo II */}
++            <section className="mb-12 pl-6 border-l border-primary/10 dark:border-primary/20">
++                <h2 className="text-2xl font-bold mb-6 italic text-primary">II. O Edif├¡cio Teol├│gico: Desconstru├º├úo da Lei</h2>
++                <div className="space-y-6 font-light leading-relaxed">
++                    <p>O autor prop├Áe uma separa├º├úo cir├║rgica entre o &quot;Deus da Lei&quot; e o &quot;Pai da Gra├ºa&quot;. Uma das teses mais provocativas ├® que a intera├º├úo de Israel foi mediada exclusivamente por anjos, seres funcionais e amorais que operam pela l├│gica da retribui├º├úo estrita.</p>
++
++                    <div className="overflow-x-auto rounded-2xl border border-slate-100 dark:border-white/5 bg-white dark:bg-card-dark my-8 shadow-lg">
++                        <table className="w-full text-left border-collapse">
++                            <thead>
++                                <tr>
++                                    <th className="p-4 text-xs uppercase tracking-widest border-b border-slate-100 dark:border-white/10 dark:text-primary">Personagem</th>
++                                    <th className="p-4 text-xs uppercase tracking-widest border-b border-slate-100 dark:border-white/10 dark:text-primary">A Sombra (Antigo Testamento)</th>
++                                    <th className="p-4 text-xs uppercase tracking-widest border-b border-slate-100 dark:border-white/10 dark:text-primary">A Realidade (Cristo)</th>
++                                </tr>
++                            </thead>
++                            <tbody>
++                                <tr>
++                                    <td className="p-4 border-b border-slate-50 dark:border-white/5 font-bold text-sm">Abel</td>
++                                    <td className="p-4 border-b border-slate-50 dark:border-white/5 text-sm">Sangue que clama por vingan├ºa.</td>
++                                    <td className="p-4 border-b border-slate-50 dark:border-white/5 text-sm">Sangue que fala melhor e oferece perd├úo.</td>
++                                </tr>
++                                <tr>
++                                    <td className="p-4 border-b border-slate-50 dark:border-white/5 font-bold text-sm">No├®</td>
++                                    <td className="p-4 border-b border-slate-50 dark:border-white/5 text-sm">Salva├º├úo que exige a destrui├º├úo.</td>
++                                    <td className="p-4 border-b border-slate-50 dark:border-white/5 text-sm">A Arca que atravessa a ira no pr├│prio corpo.</td>
++                                </tr>
++                                <tr>
++                                    <td className="p-4 border-b border-slate-50 dark:border-white/5 font-bold text-sm">Isaque</td>
++                                    <td className="p-4 border-b border-slate-50 dark:border-white/5 text-sm">O filho que carrega a lenha.</td>
++                                    <td className="p-4 border-b border-slate-50 dark:border-white/5 text-sm">O Filho que morre para que a humanidade viva.</td>
++                                </tr>
++                                <tr>
++                                    <td className="p-4 font-bold text-sm">Mois├®s</td>
++                                    <td className="p-4 text-sm">O v├®u que esconde a gl├│ria.</td>
++                                    <td className="p-4 text-sm">A nudez da Cruz que revela a gl├│ria eterna.</td>
++                                </tr>
++                            </tbody>
++                        </table>
++                    </div>
++
++                    <p>Jesus apresenta-se como o <strong>&quot;S├®timo Homem&quot;</strong> no po├ºo de Samaria, o Marido do Descanso Perfeito, em contraste com as cinco alian├ºas anteriores (os cinco maridos) que ofereceram estrutura, mas n├úo a vida plena.</p>
++                </div>
++            </section>
++
++            {/* Se├º├úo III */}
++            <section className="mb-12 pl-6 border-l border-primary/10 dark:border-primary/20">
++                <h2 className="text-2xl font-bold mb-6 italic text-primary">III. Infraestrutura Cosmol├│gica: F├¡sica Qu├óntica</h2>
++                <div className="space-y-6 font-light leading-relaxed">
++                    <p>A premissa cosmol├│gica mais radical da obra ├® a de que a Cruz de Cristo ├® a &quot;Causa Primeira&quot; da cria├º├úo. O universo tomou &quot;vida emprestada&quot; da morte futura de Cristo atrav├®s do princ├¡pio da <strong>retrocausalidade</strong>.</p>
++
++                    <div className="overflow-x-auto rounded-2xl border border-slate-100 dark:border-white/5 bg-white dark:bg-card-dark my-8 shadow-lg">
++                        <table className="w-full text-left border-collapse">
++                            <thead>
++                                <tr>
++                                    <th className="p-4 text-xs uppercase tracking-widest border-b border-slate-100 dark:border-white/10 dark:text-primary">Dimens├úo Temporal</th>
++                                    <th className="p-4 text-xs uppercase tracking-widest border-b border-slate-100 dark:border-white/10 dark:text-primary">Conceito Cosmol├│gico</th>
++                                    <th className="p-4 text-xs uppercase tracking-widest border-b border-slate-100 dark:border-white/10 dark:text-primary">Fun├º├úo Teol├│gica</th>
++                                </tr>
++                            </thead>
++                            <tbody>
++                                <tr>
++                                    <td className="p-4 border-b border-slate-50 dark:border-white/5 font-bold text-sm">Chronos</td>
++                                    <td className="p-4 border-b border-slate-50 dark:border-white/5 text-sm">Tempo Linear / Entropia.</td>
++                                    <td className="p-4 border-b border-slate-50 dark:border-white/5 text-sm">Onde o homem vive o pecado e a morte.</td>
++                                </tr>
++                                <tr>
++                                    <td className="p-4 border-b border-slate-50 dark:border-white/5 font-bold text-sm">Kairos</td>
++                                    <td className="p-4 border-b border-slate-50 dark:border-white/5 text-sm">Tempo do Real / Eternidade.</td>
++                                    <td className="p-4 border-b border-slate-50 dark:border-white/5 text-sm">Onde a obra de Cristo j├í est├í conclu├¡da.</td>
++                                </tr>
++                                <tr>
++                                    <td className="p-4 border-b border-slate-50 dark:border-white/5 font-bold text-sm">Retrocausalidade</td>
++                                    <td className="p-4 border-b border-slate-50 dark:border-white/5 text-sm">O efeito precede a causa.</td>
++                                    <td className="p-4 border-b border-slate-50 dark:border-white/5 text-sm">A Cruz sustenta a cria├º├úo do G├¬nesis.</td>
++                                </tr>
++                                <tr>
++                                    <td className="p-4 font-bold text-sm">Superposi├º├úo</td>
++                                    <td className="p-4 text-sm">Dois estados simult├óneos.</td>
++                                    <td className="p-4 text-sm">O crente est├í na terra e assentado no c├®u.</td>
++                                </tr>
++                            </tbody>
++                        </table>
++                    </div>
++                </div>
++            </section>
++
++            {/* Se├º├úo IV */}
++            <section className="mb-12 pl-6 border-l border-primary/10 dark:border-primary/20">
++                <h2 className="text-2xl font-bold mb-6 italic text-primary">IV. Horizonte Filos├│fico: Ate├¡smo Crist├úo</h2>
++                <div className="space-y-6 font-light leading-relaxed">
++                    <p>O autor prop├Áe um <strong>&quot;Ate├¡smo Crist├úo&quot;</strong> em rela├º├úo ao Deus da Lei como o ├║nico caminho para a f├® aut├¬ntica. A Cruz ├® o funeral da religi├úo burocr├ítica, onde o Juiz morreu para salvar o r├®u.</p>
++
++                    <div className="overflow-x-auto rounded-2xl border border-slate-100 dark:border-white/5 bg-white dark:bg-card-dark my-8 shadow-lg">
++                        <table className="w-full text-left border-collapse">
++                            <thead>
++                                <tr>
++                                    <th className="p-4 text-xs uppercase tracking-widest border-b border-slate-100 dark:border-white/10 dark:text-primary">Conceito Filos├│fico</th>
++                                    <th className="p-4 text-xs uppercase tracking-widest border-b border-slate-100 dark:border-white/10 dark:text-primary">Defini├º├úo na Obra</th>
++                                    <th className="p-4 text-xs uppercase tracking-widest border-b border-slate-100 dark:border-white/10 dark:text-primary">Impacto na F├®</th>
++                                </tr>
++                            </thead>
++                            <tbody>
++                                <tr>
++                                    <td className="p-4 border-b border-slate-50 dark:border-white/5 font-bold text-sm">Ate├¡smo Crist├úo</td>
++                                    <td className="p-4 border-b border-slate-50 dark:border-white/5 text-sm">Nega├º├úo do Deus que pune por m├®rito.</td>
++                                    <td className="p-4 border-b border-slate-50 dark:border-white/5 text-sm">Liberta para amar sem medo do inferno.</td>
++                                </tr>
++                                <tr>
++                                    <td className="p-4 border-b border-slate-50 dark:border-white/5 font-bold text-sm">Como Se N├úo</td>
++                                    <td className="p-4 border-b border-slate-50 dark:border-white/5 text-sm">Distanciamento dos pap├®is sociais.</td>
++                                    <td className="p-4 border-b border-slate-50 dark:border-white/5 text-sm">Permite usar o mundo sem ser possu├¡do.</td>
++                                </tr>
++                                <tr>
++                                    <td className="p-4 font-bold text-sm">Indiferen├ºa Santa</td>
++                                    <td className="p-4 text-sm">Perda do interesse no pecado.</td>
++                                    <td className="p-4 text-sm">O pecado torna-se banal e sem sabor.</td>
++                                </tr>
++                            </tbody>
++                        </table>
++                    </div>
++                </div>
++            </section>
++
++            {/* Conclus├úo */}
++            <section className="mt-20 p-10 bg-white dark:bg-card-dark rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl relative overflow-hidden text-center lg:text-left">
++                <div className="absolute top-0 left-0 w-full h-2 bg-primary"></div>
++                <h2 className="text-3xl font-bold mb-8 italic">V. Conclus├úo: O Fim do Teatro Religioso</h2>
++                <div className="space-y-6 font-light leading-relaxed text-lg text-slate-600 dark:text-slate-400">
++                    <p>
++                        O livro convida o leitor a abandonar o papel de &quot;Ad├úo Performativo&quot; e aceitar a nudez da filia├º├úo. A arquitetura da obra revela que o universo n├úo ├® um palco de testes morais, mas um cen├írio constru├¡do ao redor da Cruz.
++                    </p>
++                    <p>
++                        A vida no tempo ├® apenas o processo de despertar para essa realidade consumada. O convite de <strong>Miguel, o Pr├¡ncipe</strong>, ├® para que o homem saia da neurose e entre no descanso de quem descobriu que a &quot;Espada de Fogo&quot; j├í se apagou no peito de Jesus.
++                    </p>
++                    <p className="font-bold text-slate-900 dark:text-white mt-10 text-xl">
++                        O Evangelho n├úo ├® uma nova religi├úo, mas o fim de todas elas.
++                    </p>
++                </div>
++            </section>
++        </main>
++    );
++};
