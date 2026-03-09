@@ -3,12 +3,14 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { ReaderProvider } from './contexts/ReaderContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { Analytics } from '@vercel/analytics/react';
 
 // Layouts
 import { MainLayout } from './layouts/MainLayout';
 import { ReaderLayout } from './layouts/ReaderLayout';
 
 // Pages
+import { Landing } from './pages/Landing';
 import { Login } from './pages/Login';
 import { ChaptersIndex } from './pages/ChaptersIndex';
 import { Chapter } from './pages/Chapter';
@@ -37,40 +39,45 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 function App() {
   return (
-    <ThemeProvider>
-      <ReaderProvider>
-        <AuthProvider>
-          <BrowserRouter>
-            <Routes>
-              {/* Rota raiz (Login/Landing) não usa Layout (tem sua própria nav/footer na implementacao ou podemos envolver se necessário) */}
-              {/* Neste caso a página de Login já tem sua própria nav e footer na modelagem original. */}
-              <Route path="/" element={<Login />} />
+    <>
+      <ThemeProvider>
+        <ReaderProvider>
+          <AuthProvider>
+            <BrowserRouter>
+              <Routes>
+                {/* Rota raiz (Landing Page) */}
+                <Route path="/" element={<Landing />} />
 
-              {/* Rotas principais do Portal (usando MainLayout público) */}
-              <Route element={<MainLayout />}>
-                <Route path="/capitulos" element={<ChaptersIndex />} />
-                <Route path="/sobre-a-obra" element={<AboutBook />} />
-                <Route path="/sobre-o-autor" element={<AboutAuthor />} />
-                <Route path="/post/:slug" element={<Post />} />
-              </Route>
+                {/* Rota de Login */}
+                <Route path="/login" element={<Login />} />
 
-              {/* Rota Protegida de Configurações */}
-              <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
-                <Route path="/configuracoes" element={<Settings />} />
-              </Route>
+                {/* Rotas principais do Portal (usando MainLayout público) */}
+                <Route element={<MainLayout />}>
+                  <Route path="/capitulos" element={<ChaptersIndex />} />
+                  <Route path="/sobre-a-obra" element={<AboutBook />} />
+                  <Route path="/sobre-o-autor" element={<AboutAuthor />} />
+                  <Route path="/post/:slug" element={<Post />} />
+                </Route>
 
-              {/* Rotas do Leitor (Públicas) */}
-              <Route element={<ReaderLayout />}>
-                <Route path="/capitulo/:id" element={<Chapter />} />
-              </Route>
+                {/* Rota Protegida de Configurações */}
+                <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
+                  <Route path="/configuracoes" element={<Settings />} />
+                </Route>
 
-              {/* Rota 404 (fallback) */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </BrowserRouter>
-        </AuthProvider>
-      </ReaderProvider>
-    </ThemeProvider>
+                {/* Rotas do Leitor (Públicas) */}
+                <Route element={<ReaderLayout />}>
+                  <Route path="/capitulo/:id" element={<Chapter />} />
+                </Route>
+
+                {/* Rota 404 (fallback) */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </BrowserRouter>
+          </AuthProvider>
+        </ReaderProvider>
+      </ThemeProvider>
+      <Analytics />
+    </>
   );
 }
 

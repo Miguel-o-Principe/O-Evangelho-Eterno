@@ -75,10 +75,10 @@ export const MainNavbar: React.FC<MainNavbarProps> = ({ onMenuToggle }) => {
                             <div className="absolute right-0 mt-3 w-48 bg-white dark:bg-card-dark border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl py-3 z-50 animate-slideIn">
                                 {!session ? (
                                     <>
-                                        <Link to="/" className="flex items-center gap-3 px-5 py-2.5 text-sm hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                                        <Link to="/login" className="flex items-center gap-3 px-5 py-2.5 text-sm hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
                                             <span className="material-symbols-outlined text-xl opacity-60">login</span> Login
                                         </Link>
-                                        <Link to="/?action=register" className="flex items-center gap-3 px-5 py-2.5 text-sm hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                                        <Link to="/login?action=register" className="flex items-center gap-3 px-5 py-2.5 text-sm hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
                                             <span className="material-symbols-outlined text-xl opacity-60">person_add</span> Cadastro
                                         </Link>
                                     </>

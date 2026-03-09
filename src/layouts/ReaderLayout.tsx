@@ -84,10 +84,10 @@ export const ReaderLayout = () => {
                                 <div className="absolute right-0 mt-3 w-48 bg-white dark:bg-card-dark border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl py-3 z-50 animate-slideIn">
                                     {!session ? (
                                         <>
-                                            <Link to="/" className="flex items-center gap-3 px-5 py-2.5 text-sm hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                                            <Link to="/login" className="flex items-center gap-3 px-5 py-2.5 text-sm hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
                                                 <span className="material-symbols-outlined text-xl opacity-60">login</span> Login
                                             </Link>
-                                            <Link to="/?action=register" className="flex items-center gap-3 px-5 py-2.5 text-sm hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                                            <Link to="/login?action=register" className="flex items-center gap-3 px-5 py-2.5 text-sm hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
                                                 <span className="material-symbols-outlined text-xl opacity-60">person_add</span> Cadastro
                                             </Link>
                                         </>
@@ -116,6 +116,18 @@ export const ReaderLayout = () => {
             </nav>
 
             <Outlet />
+
+            {/* Floating Amazon CTA */}
+            <a
+                href="https://www.amazon.com.br/dp/B0GM8HTQF4"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-5 py-3 bg-primary text-white font-bold rounded-full shadow-[0_10px_25px_rgba(236,19,55,0.4)] hover:scale-105 transition-transform duration-300 md:bottom-8 md:right-8"
+                title="Comprar Obra Completa na Amazon"
+            >
+                <span className="material-symbols-outlined text-xl">shopping_cart</span>
+                <span className="hidden sm:inline text-sm uppercase tracking-widest">Obra Completa</span>
+            </a>
         </div>
     );
 };
