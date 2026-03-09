@@ -114,7 +114,7 @@ export const Login = () => {
                         </h1>
                         <div className="h-1 w-24 bg-primary rounded-full lg:ml-auto"></div>
                         <p className="text-slate-600 dark:text-slate-400 font-light text-base xl:text-xl leading-relaxed max-w-sm lg:max-w-none">
-                            Mergulhe nas profundezas da Arquitetura da Graça. Revisite o Jardim do Éden e ganhe um novo olhar sobre toda a Realidade. Uma união ousada e inovadora de Teologia, Filosofia, Cosmologia e Psicanálise.
+                            Você está exausto do teatro religioso? Este não é mais um manual moral, é a implosão de todo o esforço de agradar a um Deus que já está saciado na Cruz. Mergulhe nas profundezas da Arquitetura da Graça. Revisite o Jardim do Éden e ganhe um novo olhar sobre toda a Realidade. Uma união ousada e inovadora de Teologia, Filosofia, Cosmologia e Psicanálise.
                         </p>
                     </div>
 
