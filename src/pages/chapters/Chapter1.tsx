@@ -1,11 +1,18 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Chapter1Content from './content/Chapter1.mdx';
+import { ChapterMeta } from '../../components/ChapterMeta';
 import { AmazonCTA } from '../../components/AmazonCTA';
 
 export const Chapter1 = () => {
     return (
         <>
+            <ChapterMeta
+                title="A Topografia do Desejo e a Desconstrução do Sujeito Performativo"
+                description="Descubra como os 'Nãos' da Lei não freiam o pecado, mas funcionam como a verdadeira força do Desejo."
+                chapterNumber="01"
+                image="/images/capitulo-1-bg.png"
+            />
             {/* Header Visual */}
             <header className="relative h-[80vh] w-full overflow-hidden flex items-end">
                 <div className="absolute inset-0 scale-105">

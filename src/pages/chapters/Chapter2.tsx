@@ -1,11 +1,18 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Chapter2Content from './content/Chapter2.mdx';
+import { ChapterMeta } from '../../components/ChapterMeta';
 import { AmazonCTA } from '../../components/AmazonCTA';
 
 export const Chapter2 = () => {
     return (
         <>
+            <ChapterMeta
+                title="A Antiga Serpente e a Dialética da Transgressão"
+                description="Entenda a surpreendente simbiose entre Satanás e a Lei."
+                chapterNumber="02"
+                image="/images/capitulo-2-bg.png"
+            />
             <header className="relative h-[80vh] w-full overflow-hidden flex items-end">
                 <div className="absolute inset-0 scale-105">
                     <img src="/images/capitulo-2-bg.png" alt="A Antiga Serpente" className="w-full h-full object-cover" />

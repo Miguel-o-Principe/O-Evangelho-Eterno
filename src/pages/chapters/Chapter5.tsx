@@ -2,10 +2,17 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Chapter5Content from './content/Chapter5.mdx';
 import { AmazonCTA } from '../../components/AmazonCTA';
+import { ChapterMeta } from '../../components/ChapterMeta';
 
 export const Chapter5 = () => {
     return (
         <>
+            <ChapterMeta
+                title="A Transição do Fazer ao Ser no Retorno ao Jardim"
+                description="O fim da neurose e a passagem definitiva do 'Fazer' para o 'Ser': Chega de mentiras e personagens."
+                chapterNumber="05"
+                image="/images/capitulo-5-bg.png"
+            />
             <header className="relative h-[80vh] w-full overflow-hidden flex items-end">
                 <div className="absolute inset-0 scale-105">
                     <img src="/images/capitulo-5-bg.png" alt="O Jardim: Do Personagem à Presença" className="w-full h-full object-cover" />

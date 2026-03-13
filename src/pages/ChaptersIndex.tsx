@@ -10,7 +10,7 @@ export const ChaptersIndex = () => {
     const { user } = useAuth();
     const { posts } = usePosts();
 
-    const isAuthor = user?.email === 'smashertx@gmail.com';
+    const isAuthor = user?.user_metadata?.role === 'admin';
 
     const scrollCarousel = (distance: number) => {
         if (scrollContainerRef.current) {

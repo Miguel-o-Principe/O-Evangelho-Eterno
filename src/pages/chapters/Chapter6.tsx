@@ -2,10 +2,17 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Chapter6Content from './content/Chapter6.mdx';
 import { AmazonCTA } from '../../components/AmazonCTA';
+import { ChapterMeta } from '../../components/ChapterMeta';
 
 export const Chapter6 = () => {
     return (
         <>
+            <ChapterMeta
+                title="O Evangelho Eterno: A Morte da Lei e o Advento do Ser"
+                description="O convite final para abandonar toda ansiedade e entrar no descanso definitivo do Sábado Eterno."
+                chapterNumber="06"
+                image="/images/capitulo-6-bg.png"
+            />
             <header className="relative h-[80vh] w-full overflow-hidden flex items-end">
                 <div className="absolute inset-0 scale-105">
                     {/* Imagem com object-center para corrigir a exposição da imagem */}

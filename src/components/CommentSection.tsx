@@ -40,6 +40,8 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
     const [errorMsg, setErrorMsg] = useState('');
     const [replyingTo, setReplyingTo] = useState<string | null>(null);
     const [replyContent, setReplyContent] = useState('');
+    const PAGE_SIZE = 10;
+    const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
     useEffect(() => {
         fetchComments();
@@ -175,7 +177,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
         }).format(date);
     };
 
-    const isAuthor = user?.email === 'smashertx@gmail.com';
+    const isAuthor = user?.user_metadata?.role === 'admin';
 
     const handleLike = async (commentId: string, currentLikes: string[]) => {
         if (!session || !user) {
@@ -311,7 +313,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                     </div>
                 ) : (
                     <div className="space-y-6">
-                        {comments.filter(c => !c.parent_id).map((comment) => (
+                        {comments.filter(c => !c.parent_id).slice(0, visibleCount).map((comment) => (
                             <div key={comment.id} className="animate-in fade-in slide-in-from-bottom-2 duration-500">
                                 <div className="flex gap-4">
                                     <div className="hidden sm:flex size-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 items-center justify-center shrink-0 overflow-hidden">
@@ -512,6 +514,19 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                                 )}
                             </div>
                         ))}
+
+                        {/* Load More Button */}
+                        {comments.filter(c => !c.parent_id).length > visibleCount && (
+                            <div className="flex justify-center mt-8">
+                                <button
+                                    onClick={() => setVisibleCount(prev => prev + PAGE_SIZE)}
+                                    className="flex items-center gap-2 px-6 py-3 bg-slate-100 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-all text-sm"
+                                >
+                                    <span className="material-symbols-outlined text-lg">expand_more</span>
+                                    Carregar mais comentários
+                                </button>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>

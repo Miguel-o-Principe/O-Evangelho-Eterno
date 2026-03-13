@@ -2,10 +2,17 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Chapter4_1Content from './content/Chapter4_1.mdx';
 import { AmazonCTA } from '../../components/AmazonCTA';
+import { ChapterMeta } from '../../components/ChapterMeta';
 
 export const Chapter4_1 = () => {
     return (
         <>
+            <ChapterMeta
+                title="A Cosmologia da Vida e o Fim da Neurose Religiosa"
+                description="Uma elevação da exegese a uma matriz cosmológica: a Nova Física Espiritual."
+                chapterNumber="04.1"
+                image="/images/capitulo-4-bg.png"
+            />
             <header className="relative h-[80vh] w-full overflow-hidden flex items-end">
                 <div className="absolute inset-0 scale-105">
                     <img src="/images/capitulo-4-bg.png" alt="Cosmologia da Vida" className="w-full h-full object-cover object-center" />

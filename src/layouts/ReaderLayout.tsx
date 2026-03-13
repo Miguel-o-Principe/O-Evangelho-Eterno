@@ -11,12 +11,22 @@ export const ReaderLayout = () => {
     const [settingsOpen, setSettingsOpen] = useState(false);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const [progress, setProgress] = useState(0);
+    const [searchOpen, setSearchOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
     const location = useLocation();
     const navigate = useNavigate();
 
     const handleLogout = async () => {
         await supabase.auth.signOut();
         navigate('/');
+    };
+
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (searchQuery.trim()) {
+            // Use native browser find
+            (window as any).find(searchQuery, false, false, true);
+        }
     };
 
     useEffect(() => {
@@ -43,6 +53,8 @@ export const ReaderLayout = () => {
 
     useEffect(() => {
         window.scrollTo(0, 0);
+        setSearchOpen(false);
+        setSearchQuery('');
     }, [location.pathname]);
 
     return (
@@ -60,6 +72,25 @@ export const ReaderLayout = () => {
                     </div>
 
                     <div className="flex items-center gap-2">
+                        {/* Search */}
+                        {searchOpen && (
+                            <form onSubmit={handleSearch} className="flex items-center gap-1 animate-in slide-in-from-right-4 fade-in duration-200">
+                                <input
+                                    type="text"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    placeholder="Buscar no texto..."
+                                    className="w-32 sm:w-48 px-3 py-1.5 text-xs bg-slate-100 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-primary/40 transition-all"
+                                    autoFocus
+                                />
+                                <button type="button" onClick={() => { setSearchOpen(false); setSearchQuery(''); }} className="p-1 hover:bg-slate-100 dark:hover:bg-white/5 rounded-full transition-colors">
+                                    <span className="material-symbols-outlined text-sm text-slate-400">close</span>
+                                </button>
+                            </form>
+                        )}
+                        <button onClick={() => setSearchOpen(!searchOpen)} className="p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-full transition-colors" title="Buscar no capítulo">
+                            <span className="material-symbols-outlined text-xl">search</span>
+                        </button>
                         <button onClick={() => setSettingsOpen(!settingsOpen)} className="p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-full transition-colors relative" title="Configurações de Leitura">
                             <span className="material-symbols-outlined text-xl">settings_brightness</span>
                         </button>
