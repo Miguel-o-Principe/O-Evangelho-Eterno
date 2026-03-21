@@ -28,24 +28,33 @@ export const chapters = [
         desc: `Jesus Cristo, a tese central e cosmológica do livro. Mergulhe na "Física da Graça", no nascimento de uma Nova Teologia.`
     },
     {
-        id: "4.1",
-        n: "04.1",
+        id: "5",
+        n: "05",
         title: "A Cosmologia da Vida",
         img: "/images/capitulo-4-bg.png",
         desc: `A Cosmologia da Vida e o Fim da Neurose Religiosa: Uma elevação da exegese a uma matriz cosmológica.`
     },
     {
-        id: "5",
-        n: "05",
+        id: "6",
+        n: "06",
+        title: "Capítulo 06",
+        img: "/images/capitulo-4-bg.png",
+        desc: `Conteúdo em preparação. Em breve disponível.`
+    },
+    {
+        id: "7",
+        n: "07",
         title: "O Jardim",
         img: "/images/capitulo-5-bg.png",
         desc: `O fim da neurose e a passagem definitiva do "Fazer" para o "Ser": Chega de mentiras e personagens.`
     },
     {
-        id: "6",
-        n: "06",
+        id: "8",
+        n: "08",
         title: "O Evangelho Eterno",
         img: "/images/capitulo-6-bg.png",
         desc: `O convite final para abandonar toda ansiedade e entrar no descanso definitivo do Sábado Eterno.`
     }
 ];
+
+

@@ -58,7 +58,7 @@ export const ReaderLayout = () => {
     }, [location.pathname]);
 
     return (
-        <div className="min-h-screen bg-[#f8f6f6] dark:bg-dark-bg text-slate-800 dark:text-slate-200 font-sans transition-colors duration-500">
+        <div className="min-h-screen bg-background-light dark:bg-dark-bg text-slate-800 dark:text-[#f5e6c8] font-sans transition-colors duration-500">
             <nav className="glass-nav fixed top-0 w-full z-50 border-b border-slate-200 dark:border-white/10">
                 <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
                     <Link to="/capitulos" className="flex items-center gap-2 group transition-all">
@@ -143,7 +143,7 @@ export const ReaderLayout = () => {
                 </div>
 
                 <ReaderSettings isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} />
-                <div className="h-[3px] bg-primary transition-all duration-300 shadow-[0_0_10px_rgba(236,19,55,0.5)]" style={{ width: `${progress}%` }}></div>
+                <div className="h-[3px] bg-primary transition-all duration-300 shadow-[0_0_10px_rgba(212,168,75,0.6)]" style={{ width: `${progress}%` }}></div>
             </nav>
 
             <Outlet />

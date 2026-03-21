@@ -18,9 +18,10 @@ import { Settings } from './pages/Settings';
 import { AboutBook } from './pages/AboutBook';
 import { AboutAuthor } from './pages/AboutAuthor';
 import { Post } from './pages/Post';
+import { Admin } from './pages/Admin';
 
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { session, loading } = useAuth();
+const ProtectedRoute = ({ children, adminOnly = false }: { children: React.ReactNode; adminOnly?: boolean }) => {
+  const { session, loading, user } = useAuth();
 
   if (loading) {
     return (
@@ -31,6 +32,10 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (!session) {
+    return <Navigate to="/" replace />;
+  }
+
+  if (adminOnly && user?.user_metadata?.is_admin !== true) {
     return <Navigate to="/" replace />;
   }
 
@@ -63,6 +68,9 @@ function App() {
                 <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
                   <Route path="/configuracoes" element={<Settings />} />
                 </Route>
+
+                {/* Rota Admin (apenas is_admin) */}
+                <Route path="/admin" element={<ProtectedRoute adminOnly><Admin /></ProtectedRoute>} />
 
                 {/* Rotas do Leitor (Públicas) */}
                 <Route element={<ReaderLayout />}>

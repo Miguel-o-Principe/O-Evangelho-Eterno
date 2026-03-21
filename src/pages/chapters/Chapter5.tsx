@@ -8,14 +8,14 @@ export const Chapter5 = () => {
     return (
         <>
             <ChapterMeta
-                title="A Transição do Fazer ao Ser no Retorno ao Jardim"
-                description="O fim da neurose e a passagem definitiva do 'Fazer' para o 'Ser': Chega de mentiras e personagens."
+                title="A Cosmologia da Vida e o Fim da Neurose Religiosa"
+                description="Uma elevação da exegese a uma matriz cosmológica: a Nova Física Espiritual."
                 chapterNumber="05"
-                image="/images/capitulo-5-bg.png"
+                image="/images/capitulo-4-bg.png"
             />
             <header className="relative h-[80vh] w-full overflow-hidden flex items-end">
                 <div className="absolute inset-0 scale-105">
-                    <img src="/images/capitulo-5-bg.png" alt="O Jardim: Do Personagem à Presença" className="w-full h-full object-cover" />
+                    <img src="/images/capitulo-4-bg.png" alt="Cosmologia da Vida" className="w-full h-full object-cover object-center" />
                     <div className="absolute inset-0 bg-gradient-to-t from-dark-bg via-dark-bg/40 to-transparent"></div>
                 </div>
 
@@ -23,13 +23,13 @@ export const Chapter5 = () => {
                     <div className="max-w-5xl mx-auto">
                         <div className="flex flex-col items-center text-center">
                             <div className="w-12 h-[2px] bg-primary mb-8 text-white"></div>
-                            <span className="text-primary font-bold tracking-[0.5em] uppercase text-[10px] mb-6 block">Arquitetura da Existência</span>
+                            <span className="text-primary font-bold tracking-[0.5em] uppercase text-[10px] mb-6 block">A Nova Física Espiritual</span>
                             <h1 className="text-4xl md:text-6xl font-serif font-bold text-white mb-8 italic leading-tight max-w-5xl">
-                                A Transição do Fazer ao Ser no Retorno ao Jardim
+                                A Cosmologia da Vida e o Fim da Neurose Religiosa
                             </h1>
                             <div className="flex items-center gap-8 text-white/50 text-[10px] font-bold uppercase tracking-widest">
-                                <span className="flex items-center gap-2"><span className="material-symbols-outlined text-sm text-primary">park</span> Cap. 05</span>
-                                <span className="flex items-center gap-2"><span className="material-symbols-outlined text-sm text-primary">hourglass_empty</span> 40 min de leitura</span>
+                                <span className="flex items-center gap-2"><span className="material-symbols-outlined text-sm text-primary">public</span> Cap. 05</span>
+                                <span className="flex items-center gap-2"><span className="material-symbols-outlined text-sm text-primary">hourglass_empty</span> 45 min de leitura</span>
                             </div>
                         </div>
                     </div>
@@ -45,12 +45,12 @@ export const Chapter5 = () => {
 
                 <footer className="mt-32 pt-16 border-t border-slate-200 dark:border-white/5">
                     <div className="flex flex-col md:flex-row items-stretch gap-6">
-                        <Link to="/capitulo/4.1" className="flex-1 p-8 rounded-3xl bg-slate-100/50 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition-all group">
+                        <Link to="/capitulo/4" className="flex-1 p-8 rounded-3xl bg-slate-100/50 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition-all group">
                             <div className="flex items-start gap-4">
                                 <span className="material-symbols-outlined text-slate-400 group-hover:-translate-x-1 transition-transform">arrow_back</span>
                                 <div>
-                                    <span className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Capítulo 04.1</span>
-                                    <h4 className="font-serif italic text-xl mt-2 text-slate-600 dark:text-slate-400">A Cosmologia da Vida</h4>
+                                    <span className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Capítulo 04</span>
+                                    <h4 className="font-serif italic text-xl mt-2 text-slate-600 dark:text-slate-400">A Árvore da Vida</h4>
                                 </div>
                             </div>
                         </Link>
@@ -59,7 +59,7 @@ export const Chapter5 = () => {
                             <div className="flex justify-between items-start">
                                 <div>
                                     <span className="text-[10px] uppercase tracking-widest text-white/70 font-bold">Próximo Capítulo</span>
-                                    <h4 className="font-serif italic text-2xl mt-2">O Evangelho Eterno</h4>
+                                    <h4 className="font-serif italic text-2xl mt-2">O Retorno ao Jardim</h4>
                                 </div>
                                 <span className="material-symbols-outlined text-3xl group-hover:translate-x-2 transition-transform">arrow_forward</span>
                             </div>

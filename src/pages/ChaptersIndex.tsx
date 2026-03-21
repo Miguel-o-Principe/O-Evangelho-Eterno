@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { chapters } from '../data/chapters';
+import { useChapters } from '../hooks/useChapters';
 import { useAuth } from '../contexts/AuthContext';
 import { usePosts } from '../hooks/usePosts';
 
@@ -9,8 +9,9 @@ export const ChaptersIndex = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
     const { posts } = usePosts();
+    const { chapters, loading: chaptersLoading } = useChapters();
 
-    const isAuthor = user?.user_metadata?.role === 'admin';
+    const isAdmin = user?.user_metadata?.is_admin === true;
 
     const scrollCarousel = (distance: number) => {
         if (scrollContainerRef.current) {
@@ -38,13 +39,13 @@ export const ChaptersIndex = () => {
                     </p>
                 </div>
 
-                {isAuthor && (
+                {isAdmin && (
                     <button
-                        onClick={() => alert('Para criar uma nova postagem, basta adicionar um arquivo .mdx na pasta src/posts! O sistema carregará automaticamente.')}
+                        onClick={() => navigate('/admin')}
                         className="flex items-center gap-2 px-6 py-3 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:brightness-110 transition-all shrink-0"
                     >
-                        <span className="material-symbols-outlined">edit_square</span>
-                        Nova Postagem
+                        <span className="material-symbols-outlined">admin_panel_settings</span>
+                        Painel Admin
                     </button>
                 )}
             </div>
@@ -66,17 +67,17 @@ export const ChaptersIndex = () => {
                 {/* Scrollable Area */}
                 <div id="chapter-scroll" ref={scrollContainerRef} className="flex flex-col sm:flex-row sm:overflow-x-auto sm:snap-x sm:snap-mandatory gap-8 px-4 sm:px-20 pb-12 pt-2 no-scrollbar scroll-smooth items-stretch">
 
-                    {/* Author's New Post Card */}
-                    {isAuthor && (
+                    {/* Admin Quick Add Card */}
+                    {isAdmin && (
                         <div
-                            onClick={() => alert('Para criar uma nova postagem, basta adicionar um arquivo .mdx na pasta src/posts! O sistema carregará automaticamente.')}
+                            onClick={() => navigate('/admin')}
                             className="chapter-card sm:snap-start sm:snap-always shrink-0 w-full sm:w-[340px] flex flex-col items-center justify-center gap-4 rounded-2xl bg-primary/5 dark:bg-primary/10 border-2 border-dashed border-primary/30 hover:border-primary/60 hover:bg-primary/10 dark:hover:bg-primary/20 transition-all cursor-pointer group py-12 sm:py-0"
                         >
                             <div className="size-16 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform">
                                 <span className="material-symbols-outlined text-3xl text-primary">add</span>
                             </div>
-                            <h3 className="text-xl font-bold text-primary italic">Nova Postagem MDX</h3>
-                            <p className="text-slate-500 text-sm text-center px-8">Adicionar um novo arquivo .mdx na pasta src/posts.</p>
+                            <h3 className="text-xl font-bold text-primary italic">Novo Capítulo</h3>
+                            <p className="text-slate-500 text-sm text-center px-8">Adicionar um novo capítulo, editar ou gerenciar conteúdo.</p>
                         </div>
                     )}
 
@@ -114,24 +115,28 @@ export const ChaptersIndex = () => {
                         </div>
                     ))}
 
-                    {chapters.map((chap) => (
+                    {chaptersLoading ? (
+                        <div className="flex items-center justify-center w-full py-24">
+                            <span className="material-symbols-outlined animate-spin text-4xl text-primary">sync</span>
+                        </div>
+                    ) : chapters.map((chap) => (
                         <div
                             key={chap.id}
-                            onClick={() => navigate(`/capitulo/${chap.id}`)}
+                            onClick={() => navigate(`/capitulo/${chap.order_num}`)}
                             className="chapter-card sm:snap-start sm:snap-always shrink-0 w-full sm:w-[340px] flex flex-col gap-0 rounded-2xl bg-white dark:bg-card-dark border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-2xl transition-all overflow-hidden cursor-pointer"
                         >
                             <div
                                 className="w-full aspect-[3/4] bg-cover bg-center relative chapter-img"
-                                style={{ backgroundImage: `url('${chap.img}')` }}
+                                style={{ backgroundImage: `url('${chap.image_url}')` }}
                             >
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
                                 <div className="absolute bottom-6 left-6 right-6 text-white">
-                                    <span className="chapter-num text-primary font-bold text-xs uppercase tracking-[0.2em] mb-2 block">Capítulo {chap.n}</span>
+                                    <span className="chapter-num text-primary font-bold text-xs uppercase tracking-[0.2em] mb-2 block">Capítulo {String(chap.order_num).padStart(2, '0')}</span>
                                     <h3 className="chapter-title text-2xl font-bold leading-tight italic">{chap.title}</h3>
                                 </div>
                             </div>
                             <div className="flex flex-col flex-1 p-6 gap-6">
-                                <p className="chapter-desc text-slate-600 dark:text-slate-400 text-sm leading-relaxed line-clamp-3">{chap.desc}</p>
+                                <p className="chapter-desc text-slate-600 dark:text-slate-400 text-sm leading-relaxed line-clamp-3">{chap.description}</p>
                                 <button className="w-full flex items-center justify-center gap-2 rounded-lg h-11 px-4 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-slate-100 hover:bg-primary hover:text-white transition-all text-sm font-bold mt-auto group">
                                     Explorar
                                     <span className="material-symbols-outlined text-lg translate-x-0 group-hover:translate-x-1 transition-transform">arrow_forward</span>
