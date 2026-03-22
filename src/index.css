@@ -2,7 +2,10 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-    --color-primary: #1a2744;
+    --color-primary: 180, 0, 0;
+    --color-primary-rgb: 180, 0, 0;
+    --color-primary-hex: #B40000;
+
     --color-secondary: #d4a84b;
     --color-primary-dark: #1a2744;
     --color-accent: #d4a84b;
@@ -237,4 +240,15 @@ tr:last-child td {
     #chapter-scroll {
         scroll-padding-left: 5rem;
     }
+}
+
+/* Tailwind custom utility (caso exista) */
+.bg-primary {
+  background-color: rgb(var(--color-primary));
+}
+.text-primary {
+  color: rgb(var(--color-primary));
+}
+.border-primary {
+  border-color: rgb(var(--color-primary));
 }
