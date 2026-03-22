@@ -2,13 +2,11 @@ import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useChapters } from '../hooks/useChapters';
 import { useAuth } from '../contexts/AuthContext';
-import { usePosts } from '../hooks/usePosts';
 
 export const ChaptersIndex = () => {
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
     const { user } = useAuth();
-    const { posts } = usePosts();
     const { chapters, loading: chaptersLoading } = useChapters();
 
     const isAdmin = user?.user_metadata?.is_admin === true;
@@ -80,40 +78,6 @@ export const ChaptersIndex = () => {
                             <p className="text-slate-500 text-sm text-center px-8">Adicionar um novo capítulo, editar ou gerenciar conteúdo.</p>
                         </div>
                     )}
-
-                    {/* MDX Posts */}
-                    {posts.map((post) => (
-                        <div
-                            key={post.slug}
-                            onClick={() => navigate(`/post/${post.slug}`)}
-                            className="chapter-card sm:snap-start sm:snap-always shrink-0 w-full sm:w-[340px] flex flex-col gap-0 rounded-2xl bg-white dark:bg-card-dark border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-2xl transition-all overflow-hidden cursor-pointer"
-                        >
-                            <div
-                                className="w-full h-48 bg-cover bg-center relative"
-                                style={{ backgroundImage: `url('${post.coverImage || ''}')` }}
-                            >
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
-                                {!post.coverImage && <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-primary/40"></div>}
-                                <div className="absolute bottom-6 left-6 right-6 text-white text-left">
-                                    <span className="text-primary font-bold text-[10px] uppercase tracking-[0.2em] mb-2 block flex items-center gap-1">
-                                        <span className="material-symbols-outlined text-xs">article</span>
-                                        Artigo
-                                    </span>
-                                    <h3 className="text-xl font-bold leading-tight italic line-clamp-2">{post.title}</h3>
-                                </div>
-                            </div>
-                            <div className="flex flex-col flex-1 p-6 gap-4 text-left">
-                                <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed line-clamp-3">{post.description}</p>
-                                <div className="mt-auto flex items-center justify-between text-xs text-slate-500 font-medium">
-                                    <span>{new Date(post.date).toLocaleDateString('pt-BR')}</span>
-                                    <button className="flex items-center justify-center gap-1 text-primary group">
-                                        Ler
-                                        <span className="material-symbols-outlined text-sm translate-x-0 group-hover:translate-x-1 transition-transform">arrow_forward</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
 
                     {chaptersLoading ? (
                         <div className="flex items-center justify-center w-full py-24">

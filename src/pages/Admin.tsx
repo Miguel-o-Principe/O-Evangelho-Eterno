@@ -269,7 +269,13 @@ export const Admin = () => {
                 <div className={`grid ${showForm ? 'grid-cols-1 xl:grid-cols-2' : 'grid-cols-1'} gap-8`}>
                     {editMode !== 'post' && (
                     <div className="space-y-2">
-                        <h2 className="text-sm font-bold uppercase tracking-widest text-slate-500 mb-6">{chapters.length} CapÃ­tulos</h2>
+                        <div className="mb-8 pb-8 border-b-2 border-slate-100 dark:border-slate-800">
+                            <h2 className="text-sm font-bold uppercase tracking-widest text-slate-500 mb-2 flex items-center gap-2">
+                                <span className="material-symbols-outlined text-base">menu_book</span>
+                                {chapters.length} Capítulos
+                            </h2>
+                            <p className="text-xs text-slate-400">Organize e edite todos os capítulos e suas respectivas seções.</p>
+                        </div>
 
                         {(chapLoading || secLoading) ? (
                             <div className="flex justify-center py-12">
@@ -395,14 +401,20 @@ export const Admin = () => {
                     </div>
                     )}
 
-                    {/* â”€â”€ Posts List â”€â”€ */}
+
                     {editMode === 'post' && (
                     <div className="space-y-2">
-                        <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-sm font-bold uppercase tracking-widest text-slate-500">{posts.length} Artigos</h2>
-                            <button onClick={startCreatePost} className="flex items-center gap-2 px-3 py-1.5 bg-primary text-white font-bold rounded-lg text-xs hover:brightness-110 transition-all">
-                                <span className="material-symbols-outlined text-sm">add</span>
-                                Novo
+                        <div className="mb-8">
+                            <h2 className="text-sm font-bold uppercase tracking-widest text-slate-500 mb-2 flex items-center gap-2">
+                                <span className="material-symbols-outlined text-base">article</span>
+                                {posts.length} Artigos & Reflexões
+                            </h2>
+                            <p className="text-xs text-slate-400">Gerencie artigos e reflexões que aparecem na seção dedicada de artigos.</p>
+                        </div>
+                        <div className="flex items-center justify-end mb-6">
+                            <button onClick={startCreatePost} className="flex items-center gap-2 px-4 py-2.5 bg-primary text-white font-bold rounded-lg text-xs hover:brightness-110 transition-all shadow-md">
+                                <span className="material-symbols-outlined text-base">add</span>
+                                Novo Artigo
                             </button>
                         </div>
 
@@ -411,8 +423,10 @@ export const Admin = () => {
                                 <span className="material-symbols-outlined animate-spin text-4xl text-primary">sync</span>
                             </div>
                         ) : posts.length === 0 ? (
-                            <div className="p-8 text-center rounded-xl border border-dashed border-slate-200 dark:border-white/5">
-                                <p className="text-slate-500">Nenhum artigo ainda.</p>
+                            <div className="p-8 text-center rounded-2xl border border-dashed border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-slate-800/20">
+                                <span className="material-symbols-outlined text-4xl text-slate-300 dark:text-slate-600 mb-3 block">article</span>
+                                <p className="text-slate-500 font-medium">Nenhum artigo ainda.</p>
+                                <p className="text-xs text-slate-400 mt-1">Clique em "Novo Artigo" para criar seu primeiro artigo.</p>
                             </div>
                         ) : posts.map((post) => {
                             const isEditingThis = editingPostId === post.id;
@@ -427,14 +441,15 @@ export const Admin = () => {
                                         </div>
                                     )}
                                     <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-2 flex-wrap mb-1">
-                                            <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full ${post.published ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'}`}>
-                                                {post.published ? 'Publicado' : 'Rascunho'}
+                                        <div className="flex items-center gap-2 flex-wrap mb-2">
+                                            <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded-full ${post.published ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'}`}>
+                                                {post.published ? '✓ Publicado' : '⊘ Rascunho'}
                                             </span>
-                                            <span className="text-[9px] text-slate-400">{post.readTime} min</span>
+                                            <span className="text-[9px] text-slate-400 bg-slate-100 dark:bg-slate-800 dark:text-slate-500 px-2 py-1 rounded">⏱ {post.readTime} min</span>
+                                            {post.date && <span className="text-[9px] text-slate-400">📅 {new Date(post.date).toLocaleDateString('pt-BR')}</span>}
                                         </div>
-                                        <p className="font-bold text-sm truncate">{post.title}</p>
-                                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{post.author}</p>
+                                        <p className="font-bold text-sm truncate mb-0.5">{post.title}</p>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate">por <span className="font-medium">{post.author}</span></p>
                                     </div>
                                     <div className="flex items-center gap-1 shrink-0">
                                         <button onClick={() => togglePublished(post.id, 'posts', post.published)} title={post.published ? 'Despublicar' : 'Publicar'} className="p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-colors">
