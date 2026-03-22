@@ -1,11 +1,11 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MDEditor from '@uiw/react-md-editor';
-import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useChapters, ChapterSummary } from '../hooks/useChapters';
 import { useAllSectionsGrouped, SectionSummary } from '../hooks/useChapterSections';
 import { usePosts, PostMeta } from '../hooks/usePosts';
+import { supabase } from '../lib/supabase';
 
 // â”€â”€â”€ Form types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 interface ChapterForm {
@@ -239,36 +239,12 @@ export const Admin = () => {
     const showForm = editMode !== null;
     const currentTab = editMode === 'post' ? 'posts' : editMode ? 'chapters' : 'chapters';
 
+    const normalizeSlug = (value: string) => {
+        return value.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+    };
+
     return (
         <div className="min-h-screen bg-background-light dark:bg-dark-bg text-slate-800 dark:text-slate-100">
-            {/* Header */}
-            <header className="sticky top-0 z-40 glass-nav border-b border-slate-200 dark:border-white/10">
-                <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <button onClick={() => navigate('/capitulos')} className="p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-full transition-colors">
-                            <span className="material-symbols-outlined">arrow_back</span>
-                        </button>
-                        <div>
-                            <h1 className="font-bold text-lg leading-tight">Painel Admin</h1>
-                            <p className="text-[10px] uppercase tracking-widest text-slate-500">Gerenciar CapÃ­tulos, SeÃ§Ãµes e Artigos</p>
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        {editMode === 'post' ? (
-                            <button onClick={startCreatePost} className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:brightness-110 transition-all text-sm">
-                                <span className="material-symbols-outlined text-lg">add</span>
-                                Novo Artigo
-                            </button>
-                        ) : (
-                            <button onClick={startCreateChapter} className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:brightness-110 transition-all text-sm">
-                                <span className="material-symbols-outlined text-lg">add</span>
-                                Novo CapÃ­tulo
-                            </button>
-                        )}
-                    </div>
-                </div>
-            </header>
-
             {/* Tabs */}
             <div className="border-b border-slate-200 dark:border-white/5 sticky top-16 z-30 bg-background-light dark:bg-dark-bg">
                 <div className="max-w-7xl mx-auto px-6 flex gap-8">
@@ -289,10 +265,8 @@ export const Admin = () => {
                 </div>
             </div>
 
-            
+            <div className="max-w-7xl mx-auto px-6 py-8">
                 <div className={`grid ${showForm ? 'grid-cols-1 xl:grid-cols-2' : 'grid-cols-1'} gap-8`}>
-
-                    {/* â”€â”€ Chapter + Sections List â”€â”€ */}
                     {editMode !== 'post' && (
                     <div className="space-y-2">
                         <h2 className="text-sm font-bold uppercase tracking-widest text-slate-500 mb-6">{chapters.length} CapÃ­tulos</h2>
@@ -554,7 +528,7 @@ export const Admin = () => {
                     {showForm && editMode === 'post' && (
                         <FormPanel title={editingPostId ? 'Editar Artigo' : 'Novo Artigo'} onClose={cancelEdit} onSave={savePost} saving={saving} saveMsg={saveMsg}>
                             <Field label="TÃ­tulo" value={postForm.title} onChange={v => setPostForm({ ...postForm, title: v })} placeholder="TÃ­tulo do artigo" />
-                            <Field label="Slug (URL amigÃ¡vel)" value={postForm.slug} onChange={v => setPostForm({ ...postForm, slug: v.toLowerCase().replace(/[^\w-]/g, '-') })} placeholder="titulo-do-artigo" />
+                            <Field label="Slug (URL amigável)" value={postForm.slug} onChange={v => setPostForm({ ...postForm, slug: normalizeSlug(v) })} placeholder="titulo-do-artigo" />
                             <Field label="Autor" value={postForm.author} onChange={v => setPostForm({ ...postForm, author: v })} placeholder="Miguel, o PrÃ­ncipe" />
                             <Field label="URL da Imagem de Capa" value={postForm.cover_image} onChange={v => setPostForm({ ...postForm, cover_image: v })} placeholder="/images/capitulo-1-bg.png" />
                             {postForm.cover_image && <img src={postForm.cover_image} alt="Preview" className="h-20 w-full object-cover rounded-xl" />}
