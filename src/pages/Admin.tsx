@@ -7,7 +7,7 @@ import { useAllSectionsGrouped, SectionSummary } from '../hooks/useChapterSectio
 import { usePosts, PostMeta } from '../hooks/usePosts';
 import { supabase } from '../lib/supabase';
 
-// â”€â”€â”€ Form types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Form types ────────────────────────────────────────────────────────────────
 interface ChapterForm {
     order_num: number; title: string; subtitle: string; tag_line: string;
     image_url: string; description: string; content: string; read_time: number; published: boolean;
@@ -27,7 +27,7 @@ const emptyPostForm: PostForm = { title: '', description: '', author: '', slug: 
 
 type EditMode = 'chapter' | 'section' | 'post' | null;
 
-// â”€â”€â”€ Shared Form Panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Shared Form Panel ─────────────────────────────────────────────────────────
 const FormPanel = ({ title, onClose, onSave, saving, saveMsg, children }: { title: string; onClose: () => void; onSave: () => void; saving: boolean; saveMsg: string; children: React.ReactNode; }) => (
     <div className="bg-white dark:bg-card-dark rounded-3xl border border-slate-200 dark:border-white/5 p-8 h-fit sticky top-24 overflow-y-auto max-h-[calc(100vh-7rem)]">
         <div className="flex items-center justify-between mb-8">
@@ -39,7 +39,7 @@ const FormPanel = ({ title, onClose, onSave, saving, saveMsg, children }: { titl
         <div className="space-y-5">
             {children}
             {saveMsg && (
-                <p className={`text-sm text-center font-bold py-2 rounded-xl ${saveMsg.startsWith('âœ…') ? 'text-green-600 bg-green-50 dark:bg-green-900/20' : 'text-red-500 bg-red-50 dark:bg-red-900/20'}`}>{saveMsg}</p>
+                <p className={`text-sm text-center font-bold py-2 rounded-xl ${saveMsg.startsWith('✅') ? 'text-green-600 bg-green-50 dark:bg-green-900/20' : 'text-red-500 bg-red-50 dark:bg-red-900/20'}`}>{saveMsg}</p>
             )}
             <div className="flex gap-3 pt-2">
                 <button onClick={onClose} className="flex-1 py-3 rounded-xl border border-slate-200 dark:border-slate-700 font-bold text-sm hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">Cancelar</button>
@@ -52,14 +52,14 @@ const FormPanel = ({ title, onClose, onSave, saving, saveMsg, children }: { titl
     </div>
 );
 
-// â”€â”€â”€ Toggle component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Toggle component ──────────────────────────────────────────────────────────
 const Toggle = ({ value, onChange }: { value: boolean; onChange: (v: boolean) => void }) => (
     <button onClick={() => onChange(!value)} className={`relative w-12 h-6 rounded-full transition-colors ${value ? 'bg-primary' : 'bg-slate-300 dark:bg-slate-600'}`}>
         <span className={`absolute top-0.5 left-0.5 size-5 bg-white rounded-full shadow transition-transform ${value ? 'translate-x-6' : ''}`} />
     </button>
 );
 
-// â”€â”€â”€ Text field â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Text field ────────────────────────────────────────────────────────────────
 const Field = ({ label, value, onChange, placeholder, type = 'text' }: { label: string; value: string | number; onChange: (v: string) => void; placeholder?: string; type?: string }) => (
     <div>
         <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">{label}</label>
@@ -68,7 +68,7 @@ const Field = ({ label, value, onChange, placeholder, type = 'text' }: { label: 
     </div>
 );
 
-// â”€â”€â”€ Main Admin Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Main Admin Component ──────────────────────────────────────────────────────
 export const Admin = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
@@ -91,7 +91,7 @@ export const Admin = () => {
     const isAdmin = user?.user_metadata?.is_admin === true;
     useEffect(() => { if (!isAdmin) navigate('/'); }, [isAdmin, navigate]);
 
-    // â”€â”€ Edit chapter â”€â”€
+    // ── Edit chapter ──
     const startEditChapter = async (chap: ChapterSummary) => {
         setEditMode('chapter');
         setEditingChapterId(chap.id);
@@ -113,17 +113,17 @@ export const Admin = () => {
         setSaving(true); setSaveMsg('');
         if (editingChapterId) {
             const { error } = await supabase.from('chapters').update(chapterForm).eq('id', editingChapterId);
-            setSaveMsg(error ? 'âŒ ' + error.message : 'âœ… Salvo!');
+            setSaveMsg(error ? '❌ ' + error.message : '✅ Salvo!');
         } else {
             const { error } = await supabase.from('chapters').insert(chapterForm);
-            setSaveMsg(error ? 'âŒ ' + error.message : 'âœ… CapÃ­tulo criado!');
+            setSaveMsg(error ? '❌ ' + error.message : '✅ Capítulo criado!');
             if (!error) { cancelEdit(); }
         }
         setSaving(false);
         if (!saving) setTimeout(() => window.location.reload(), 1200);
     };
 
-    // â”€â”€ Edit section â”€â”€
+    // ── Edit section ──
     const startEditSection = async (sec: SectionSummary) => {
         setEditMode('section');
         setEditingSectionId(sec.id);
@@ -147,10 +147,10 @@ export const Admin = () => {
         setSaving(true); setSaveMsg('');
         if (editingSectionId) {
             const { error } = await supabase.from('chapter_sections').update(sectionForm).eq('id', editingSectionId);
-            setSaveMsg(error ? 'âŒ ' + error.message : 'âœ… Salvo!');
+            setSaveMsg(error ? '❌ ' + error.message : '✅ Salvo!');
         } else {
             const { error } = await supabase.from('chapter_sections').insert(sectionForm);
-            setSaveMsg(error ? 'âŒ ' + error.message : 'âœ… SeÃ§Ã£o criada!');
+            setSaveMsg(error ? '❌ ' + error.message : '✅ Seção criada!');
             if (!error) { cancelEdit(); }
         }
         setSaving(false);
@@ -159,7 +159,7 @@ export const Admin = () => {
 
     const cancelEdit = () => { setEditMode(null); setEditingChapterId(null); setEditingSectionId(null); setEditingPostId(null); setSaveMsg(''); };
 
-    // â”€â”€ Edit post â”€â”€
+    // ── Edit post ──
     const startEditPost = async (post: PostMeta) => {
         setEditMode('post');
         setEditingPostId(post.id);
@@ -203,7 +203,7 @@ export const Admin = () => {
                 read_time: postForm.read_time,
                 published: postForm.published,
             }).eq('id', editingPostId);
-            setSaveMsg(error ? 'âŒ ' + error.message : 'âœ… Salvo!');
+            setSaveMsg(error ? '❌ ' + error.message : '✅ Salvo!');
         } else {
             const { error } = await supabase.from('posts').insert({
                 title: postForm.title,
@@ -216,7 +216,7 @@ export const Admin = () => {
                 published: postForm.published,
                 date: new Date().toISOString(),
             });
-            setSaveMsg(error ? 'âŒ ' + error.message : 'âœ… Artigo criado!');
+            setSaveMsg(error ? '❌ ' + error.message : '✅ Artigo criado!');
             if (!error) { cancelEdit(); }
         }
         setSaving(false);
@@ -253,7 +253,7 @@ export const Admin = () => {
                         className={`py-4 px-2 font-bold text-sm uppercase tracking-widest border-b-2 transition-all ${editMode !== 'post' ? 'border-primary text-primary' : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
                     >
                         <span className="material-symbols-outlined inline mr-2 text-base align-middle">menu_book</span>
-                        CapÃ­tulos & SeÃ§Ãµes ({chapters.length})
+                        Capítulos & Seções ({chapters.length})
                     </button>
                     <button
                         onClick={() => { setEditMode('post'); setEditingChapterId(null); setEditingSectionId(null); setEditingPostId(null); }}
@@ -300,18 +300,18 @@ export const Admin = () => {
                                                     {chap.published ? 'Publicado' : 'Rascunho'}
                                                 </span>
                                                 {sections.length > 0 && (
-                                                    <span className="text-[9px] font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 dark:text-slate-500 px-1.5 py-0.5 rounded-full">{sections.length} seÃ§.</span>
+                                                    <span className="text-[9px] font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 dark:text-slate-500 px-1.5 py-0.5 rounded-full">{sections.length} seç.</span>
                                                 )}
                                             </div>
                                             <p className="font-bold text-sm truncate mt-0.5">{chap.title}</p>
                                         </div>
                                         <div className="flex items-center gap-1 shrink-0">
                                             {/* Expand sections */}
-                                            <button onClick={() => setExpandedChapter(isExpanded ? null : chap.id)} title="Ver seÃ§Ãµes" className="p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-colors">
+                                            <button onClick={() => setExpandedChapter(isExpanded ? null : chap.id)} title="Ver seções" className="p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-colors">
                                                 <span className={`material-symbols-outlined text-sm transition-transform ${isExpanded ? 'rotate-180' : ''}`}>expand_more</span>
                                             </button>
                                             {/* Add section */}
-                                            <button onClick={() => startCreateSection(chap)} title="Adicionar seÃ§Ã£o" className="p-2 hover:bg-primary/10 text-primary rounded-lg transition-colors">
+                                            <button onClick={() => startCreateSection(chap)} title="Adicionar seção" className="p-2 hover:bg-primary/10 text-primary rounded-lg transition-colors">
                                                 <span className="material-symbols-outlined text-sm">bookmark_add</span>
                                             </button>
                                             <button onClick={() => togglePublished(chap.id, 'chapters', chap.published)} title={chap.published ? 'Despublicar' : 'Publicar'} className="p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-colors">
@@ -326,7 +326,7 @@ export const Admin = () => {
                                             {deleteConfirm?.id === chap.id ? (
                                                 <>
                                                     <button onClick={handleDelete} className="px-2 py-1 bg-red-500 text-white text-[9px] font-bold rounded-lg hover:bg-red-600 transition-colors">Confirmar</button>
-                                                    <button onClick={() => setDeleteConfirm(null)} className="px-2 py-1 text-[9px] font-bold rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">âœ•</button>
+                                                    <button onClick={() => setDeleteConfirm(null)} className="px-2 py-1 text-[9px] font-bold rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">✕</button>
                                                 </>
                                             ) : (
                                                 <button onClick={() => setDeleteConfirm({ id: chap.id, type: 'chapter' })} title="Excluir" className="p-2 hover:bg-red-50 dark:hover:bg-red-500/10 text-slate-400 hover:text-red-500 rounded-lg transition-colors">
@@ -341,9 +341,9 @@ export const Admin = () => {
                                         <div className="ml-8 mt-1.5 space-y-1.5">
                                             {sections.length === 0 ? (
                                                 <div className="p-4 rounded-xl border border-dashed border-slate-200 dark:border-white/5 text-center">
-                                                    <p className="text-xs text-slate-400">Nenhuma seÃ§Ã£o ainda.</p>
+                                                    <p className="text-xs text-slate-400">Nenhuma seção ainda.</p>
                                                     <button onClick={() => startCreateSection(chap)} className="mt-2 text-xs text-primary font-bold hover:underline flex items-center gap-1 mx-auto">
-                                                        <span className="material-symbols-outlined text-sm">add</span> Adicionar primeira seÃ§Ã£o
+                                                        <span className="material-symbols-outlined text-sm">add</span> Adicionar primeira seção
                                                     </button>
                                                 </div>
                                             ) : sections.map((sec) => {
@@ -376,7 +376,7 @@ export const Admin = () => {
                                                             {deleteConfirm?.id === sec.id ? (
                                                                 <>
                                                                     <button onClick={handleDelete} className="px-2 py-1 bg-red-500 text-white text-[8px] font-bold rounded-lg">Confirmar</button>
-                                                                    <button onClick={() => setDeleteConfirm(null)} className="px-1.5 py-1 text-[8px] font-bold rounded-lg hover:bg-slate-100 dark:hover:bg-white/5">âœ•</button>
+                                                                    <button onClick={() => setDeleteConfirm(null)} className="px-1.5 py-1 text-[8px] font-bold rounded-lg hover:bg-slate-100 dark:hover:bg-white/5">✕</button>
                                                                 </>
                                                             ) : (
                                                                 <button onClick={() => setDeleteConfirm({ id: sec.id, type: 'section' })} title="Excluir" className="p-1.5 hover:bg-red-50 dark:hover:bg-red-500/10 text-slate-400 hover:text-red-500 rounded-lg transition-colors">
@@ -390,7 +390,7 @@ export const Admin = () => {
                                             {/* Add more section button */}
                                             {sections.length > 0 && (
                                                 <button onClick={() => startCreateSection(chap)} className="w-full flex items-center justify-center gap-1.5 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-primary border border-dashed border-slate-200 dark:border-white/5 rounded-xl hover:border-primary/30 transition-all">
-                                                    <span className="material-symbols-outlined text-sm">add</span> Nova seÃ§Ã£o
+                                                    <span className="material-symbols-outlined text-sm">add</span> Nova seção
                                                 </button>
                                             )}
                                         </div>
@@ -464,7 +464,7 @@ export const Admin = () => {
                                         {deleteConfirm?.id === post.id ? (
                                             <>
                                                 <button onClick={handleDelete} className="px-2 py-1 bg-red-500 text-white text-[9px] font-bold rounded-lg hover:bg-red-600 transition-colors">Confirmar</button>
-                                                <button onClick={() => setDeleteConfirm(null)} className="px-2 py-1 text-[9px] font-bold rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">âœ•</button>
+                                                <button onClick={() => setDeleteConfirm(null)} className="px-2 py-1 text-[9px] font-bold rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">✕</button>
                                             </>
                                         ) : (
                                             <button onClick={() => setDeleteConfirm({ id: post.id, type: 'post' })} title="Excluir" className="p-2 hover:bg-red-50 dark:hover:bg-red-500/10 text-slate-400 hover:text-red-500 rounded-lg transition-colors">
@@ -478,63 +478,63 @@ export const Admin = () => {
                     </div>
                     )}
 
-                    {/* â”€â”€ Edit Form Panel â”€â”€ */}
+                    {/* ── Edit Form Panel ── */}
                     {showForm && editMode === 'chapter' && (
-                        <FormPanel title={editingChapterId ? 'Editar CapÃ­tulo' : 'Novo CapÃ­tulo'} onClose={cancelEdit} onSave={saveChapter} saving={saving} saveMsg={saveMsg}>
+                        <FormPanel title={editingChapterId ? 'Editar Capítulo' : 'Novo Capítulo'} onClose={cancelEdit} onSave={saveChapter} saving={saving} saveMsg={saveMsg}>
                             <div className="grid grid-cols-2 gap-4">
-                                <Field label="NÃºmero" value={chapterForm.order_num} onChange={v => setChapterForm({ ...chapterForm, order_num: parseInt(v) || 0 })} type="number" />
+                                <Field label="Número" value={chapterForm.order_num} onChange={v => setChapterForm({ ...chapterForm, order_num: parseInt(v) || 0 })} type="number" />
                                 <Field label="Tempo (min)" value={chapterForm.read_time} onChange={v => setChapterForm({ ...chapterForm, read_time: parseInt(v) || 30 })} type="number" />
                             </div>
-                            <Field label="TÃ­tulo (Ã­ndice)" value={chapterForm.title} onChange={v => setChapterForm({ ...chapterForm, title: v })} placeholder="A Ãrvore do Conhecimento" />
-                            <Field label="SubtÃ­tulo (header)" value={chapterForm.subtitle} onChange={v => setChapterForm({ ...chapterForm, subtitle: v })} placeholder="A Topografia do Desejo..." />
-                            <Field label="Tag / Linha descritiva" value={chapterForm.tag_line} onChange={v => setChapterForm({ ...chapterForm, tag_line: v })} placeholder="AnÃ¡lise PsicanalÃ­tica" />
+                            <Field label="Título (índice)" value={chapterForm.title} onChange={v => setChapterForm({ ...chapterForm, title: v })} placeholder="A Árvore do Conhecimento" />
+                            <Field label="Subtítulo (header)" value={chapterForm.subtitle} onChange={v => setChapterForm({ ...chapterForm, subtitle: v })} placeholder="A Topografia do Desejo..." />
+                            <Field label="Tag / Linha descritiva" value={chapterForm.tag_line} onChange={v => setChapterForm({ ...chapterForm, tag_line: v })} placeholder="Análise Psicanalítica" />
                             <Field label="URL da Imagem de Capa" value={chapterForm.image_url} onChange={v => setChapterForm({ ...chapterForm, image_url: v })} placeholder="/images/capitulo-1-bg.png" />
                             {chapterForm.image_url && <img src={chapterForm.image_url} alt="Preview" className="h-20 w-full object-cover rounded-xl" />}
                             <div>
-                                <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">DescriÃ§Ã£o (Ã­ndice)</label>
+                                <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Descrição (índice)</label>
                                 <textarea value={chapterForm.description} onChange={e => setChapterForm({ ...chapterForm, description: e.target.value })} rows={2}
                                     className="w-full px-4 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-primary/30 resize-none" />
                             </div>
                             <div>
-                                <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">ConteÃºdo (Markdown)</label>
+                                <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Conteúdo (Markdown)</label>
                                 <div data-color-mode="auto" className="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700">
                                     <MDEditor value={chapterForm.content} onChange={val => setChapterForm({ ...chapterForm, content: val || '' })} height={400} preview="edit" />
                                 </div>
                             </div>
                             <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
-                                <div><p className="font-bold text-sm">Publicado</p><p className="text-[11px] text-slate-500">VisÃ­vel publicamente</p></div>
+                                <div><p className="font-bold text-sm">Publicado</p><p className="text-[11px] text-slate-500">Visível publicamente</p></div>
                                 <Toggle value={chapterForm.published} onChange={v => setChapterForm({ ...chapterForm, published: v })} />
                             </div>
                         </FormPanel>
                     )}
 
                     {showForm && editMode === 'section' && (
-                        <FormPanel title={editingSectionId ? 'Editar SeÃ§Ã£o' : 'Nova SeÃ§Ã£o'} onClose={cancelEdit} onSave={saveSection} saving={saving} saveMsg={saveMsg}>
+                        <FormPanel title={editingSectionId ? 'Editar Seção' : 'Nova Seção'} onClose={cancelEdit} onSave={saveSection} saving={saving} saveMsg={saveMsg}>
                             <div className="p-3 rounded-xl bg-primary/5 border border-primary/20 text-xs text-primary font-bold flex items-center gap-2">
                                 <span className="material-symbols-outlined text-sm">bookmark</span>
-                                SubseÃ§Ã£o do CapÃ­tulo
-                                <span className="ml-auto font-normal text-slate-500">Imagem = a do capÃ­tulo pai</span>
+                                Subseção do Capítulo
+                                <span className="ml-auto font-normal text-slate-500">Imagem = a do capítulo pai</span>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <Field label="Ordem" value={sectionForm.order_num} onChange={v => setSectionForm({ ...sectionForm, order_num: parseInt(v) || 1 })} type="number" />
                                 <Field label="Tempo (min)" value={sectionForm.read_time} onChange={v => setSectionForm({ ...sectionForm, read_time: parseInt(v) || 15 })} type="number" />
                             </div>
-                            <Field label="TÃ­tulo" value={sectionForm.title} onChange={v => setSectionForm({ ...sectionForm, title: v })} placeholder="Nome da subseÃ§Ã£o" />
-                            <Field label="SubtÃ­tulo" value={sectionForm.subtitle} onChange={v => setSectionForm({ ...sectionForm, subtitle: v })} placeholder="DescriÃ§Ã£o longa do header" />
-                            <Field label="Tag / Linha descritiva" value={sectionForm.tag_line} onChange={v => setSectionForm({ ...sectionForm, tag_line: v })} placeholder="AnÃ¡lise / Exegese..." />
+                            <Field label="Título" value={sectionForm.title} onChange={v => setSectionForm({ ...sectionForm, title: v })} placeholder="Nome da subseção" />
+                            <Field label="Subtítulo" value={sectionForm.subtitle} onChange={v => setSectionForm({ ...sectionForm, subtitle: v })} placeholder="Descrição longa do header" />
+                            <Field label="Tag / Linha descritiva" value={sectionForm.tag_line} onChange={v => setSectionForm({ ...sectionForm, tag_line: v })} placeholder="Análise / Exegese..." />
                             <div>
-                                <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">DescriÃ§Ã£o (card)</label>
+                                <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Descrição (card)</label>
                                 <textarea value={sectionForm.description} onChange={e => setSectionForm({ ...sectionForm, description: e.target.value })} rows={2}
                                     className="w-full px-4 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-primary/30 resize-none" />
                             </div>
                             <div>
-                                <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">ConteÃºdo (Markdown)</label>
+                                <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Conteúdo (Markdown)</label>
                                 <div data-color-mode="auto" className="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700">
                                     <MDEditor value={sectionForm.content} onChange={val => setSectionForm({ ...sectionForm, content: val || '' })} height={400} preview="edit" />
                                 </div>
                             </div>
                             <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
-                                <div><p className="font-bold text-sm">Publicado</p><p className="text-[11px] text-slate-500">VisÃ­vel publicamente</p></div>
+                                <div><p className="font-bold text-sm">Publicado</p><p className="text-[11px] text-slate-500">Visível publicamente</p></div>
                                 <Toggle value={sectionForm.published} onChange={v => setSectionForm({ ...sectionForm, published: v })} />
                             </div>
                         </FormPanel>
@@ -542,27 +542,27 @@ export const Admin = () => {
 
                     {showForm && editMode === 'post' && (
                         <FormPanel title={editingPostId ? 'Editar Artigo' : 'Novo Artigo'} onClose={cancelEdit} onSave={savePost} saving={saving} saveMsg={saveMsg}>
-                            <Field label="TÃ­tulo" value={postForm.title} onChange={v => setPostForm({ ...postForm, title: v })} placeholder="TÃ­tulo do artigo" />
+                            <Field label="Título" value={postForm.title} onChange={v => setPostForm({ ...postForm, title: v })} placeholder="Título do artigo" />
                             <Field label="Slug (URL amigável)" value={postForm.slug} onChange={v => setPostForm({ ...postForm, slug: normalizeSlug(v) })} placeholder="titulo-do-artigo" />
-                            <Field label="Autor" value={postForm.author} onChange={v => setPostForm({ ...postForm, author: v })} placeholder="Miguel, o PrÃ­ncipe" />
+                            <Field label="Autor" value={postForm.author} onChange={v => setPostForm({ ...postForm, author: v })} placeholder="Miguel, o Príncipe" />
                             <Field label="URL da Imagem de Capa" value={postForm.cover_image} onChange={v => setPostForm({ ...postForm, cover_image: v })} placeholder="/images/capitulo-1-bg.png" />
                             {postForm.cover_image && <img src={postForm.cover_image} alt="Preview" className="h-20 w-full object-cover rounded-xl" />}
                             <div className="grid grid-cols-2 gap-4">
                                 <Field label="Tempo de leitura (min)" value={postForm.read_time} onChange={v => setPostForm({ ...postForm, read_time: parseInt(v) || 15 })} type="number" />
                             </div>
                             <div>
-                                <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">DescriÃ§Ã£o (resumo)</label>
+                                <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Descrição (resumo)</label>
                                 <textarea value={postForm.description} onChange={e => setPostForm({ ...postForm, description: e.target.value })} rows={2}
                                     className="w-full px-4 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-primary/30 resize-none" />
                             </div>
                             <div>
-                                <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">ConteÃºdo (Markdown/HTML)</label>
+                                <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Conteúdo (Markdown/HTML)</label>
                                 <div data-color-mode="auto" className="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700">
                                     <MDEditor value={postForm.content} onChange={val => setPostForm({ ...postForm, content: val || '' })} height={400} preview="edit" />
                                 </div>
                             </div>
                             <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
-                                <div><p className="font-bold text-sm">Publicado</p><p className="text-[11px] text-slate-500">VisÃ­vel na pÃ¡gina de artigos</p></div>
+                                <div><p className="font-bold text-sm">Publicado</p><p className="text-[11px] text-slate-500">Visível na página de artigos</p></div>
                                 <Toggle value={postForm.published} onChange={v => setPostForm({ ...postForm, published: v })} />
                             </div>
                         </FormPanel>

@@ -2,9 +2,9 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-    --color-primary: 180, 0, 0;
-    --color-primary-rgb: 180, 0, 0;
-    --color-primary-hex: #B40000;
+    --color-primary: 255, 196, 92;
+    --color-primary-rgb: 255, 196, 92;
+    --color-primary-hex: #FFC45C;
 
     --color-secondary: #d4a84b;
     --color-primary-dark: #1a2744;
