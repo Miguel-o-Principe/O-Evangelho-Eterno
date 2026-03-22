@@ -1,34 +1,63 @@
-import React, { useEffect, useState, Suspense } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { mdxComponents } from '../components/MDXProvider';
+import { useTheme } from '../contexts/ThemeContext';
 import { CommentSection } from '../components/CommentSection';
+import { supabase } from '../lib/supabase';
 import { PostMeta } from '../hooks/usePosts';
 
 export const Post = () => {
     const { slug } = useParams<{ slug: string }>();
     const navigate = useNavigate();
-    const [PostComponent, setPostComponent] = useState<React.ComponentType<any> | null>(null);
-    const [meta, setMeta] = useState<PostMeta | null>(null);
+    const { theme } = useTheme();
+    const [post, setPost] = useState<PostMeta | null>(null);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
 
     useEffect(() => {
         window.scrollTo(0, 0);
         setError(false);
-        setPostComponent(null);
-        setMeta(null);
+        setPost(null);
+        setLoading(true);
 
-        if (slug) {
-            import(`../posts/${slug}.mdx`)
-                .then(module => {
-                    // console.log("Module Loaded", module);
-                    setPostComponent(() => module.default);
-                    setMeta(module.meta);
-                })
-                .catch(err => {
-                    console.error("Failed to load generic post module:", err);
+        const fetchPost = async () => {
+            if (!slug) return;
+
+            try {
+                const { data, error: queryError } = await supabase
+                    .from('posts')
+                    .select('*')
+                    .eq('slug', slug)
+                    .eq('published', true)
+                    .single();
+
+                if (queryError || !data) {
                     setError(true);
-                });
-        }
+                    return;
+                }
+
+                const formattedPost: PostMeta = {
+                    id: data.id,
+                    title: data.title,
+                    description: data.description,
+                    date: new Date(data.date).toISOString().split('T')[0],
+                    author: data.author,
+                    coverImage: data.cover_image,
+                    slug: data.slug,
+                    readTime: data.read_time,
+                    content: data.content,
+                    published: data.published,
+                };
+
+                setPost(formattedPost);
+            } catch (err) {
+                console.error('Error loading post:', err);
+                setError(true);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchPost();
     }, [slug]);
 
     if (error) {
@@ -48,10 +77,27 @@ export const Post = () => {
         );
     }
 
-    if (!PostComponent || !meta) {
+    if (loading) {
         return (
             <div className="flex justify-center items-center py-32 min-h-[60vh]">
                 <span className="material-symbols-outlined animate-spin text-4xl text-primary">sync</span>
+            </div>
+        );
+    }
+
+    if (!post) {
+        return (
+            <div className="flex flex-col items-center justify-center py-32 px-6 fade-up">
+                <span className="material-symbols-outlined text-6xl text-slate-300 dark:text-slate-700 mb-6">description</span>
+                <h2 className="text-2xl font-bold mb-4">Postagem não encontrada</h2>
+                <p className="text-slate-500 mb-8 max-w-sm text-center">O artigo que você procura não existe ou ainda não foi publicado.</p>
+                <button
+                    onClick={() => navigate('/capitulos')}
+                    className="flex items-center gap-2 px-6 py-3 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:brightness-110 transition-all text-sm"
+                >
+                    <span className="material-symbols-outlined text-xl">arrow_back</span>
+                    Voltar para o Índice
+                </button>
             </div>
         );
     }
@@ -61,15 +107,15 @@ export const Post = () => {
         day: 'numeric',
         month: 'long',
         year: 'numeric'
-    }).format(new Date(meta.date));
+    }).format(new Date(post.date));
 
     return (
         <React.Fragment>
             {/* Header Visual */}
             <header className="relative h-[60vh] md:h-[70vh] w-full overflow-hidden flex items-end">
                 <div className="absolute inset-0 scale-105">
-                    {meta.coverImage ? (
-                        <img src={meta.coverImage} alt={meta.title} className="w-full h-full object-cover" />
+                    {post.coverImage ? (
+                        <img src={post.coverImage} alt={post.title} className="w-full h-full object-cover" />
                     ) : (
                         <div className="w-full h-full bg-gradient-to-br from-slate-900 to-primary/40"></div>
                     )}
@@ -82,19 +128,19 @@ export const Post = () => {
                             <div className="w-12 h-[2px] bg-primary mb-8 text-white"></div>
 
                             <h1 className="text-4xl md:text-6xl font-serif font-bold text-white mb-6 italic leading-tight max-w-4xl text-balance">
-                                {meta.title}
+                                {post.title}
                             </h1>
 
-                            {meta.description && (
+                            {post.description && (
                                 <p className="text-slate-200 text-lg md:text-xl font-light mb-8 max-w-2xl px-4 text-center text-balance opacity-90 leading-relaxed shadow-sm">
-                                    {meta.description}
+                                    {post.description}
                                 </p>
                             )}
 
                             <div className="flex items-center justify-center flex-wrap gap-6 text-white/50 text-[10px] font-bold uppercase tracking-widest mt-4 bg-black/20 px-6 py-3 rounded-full backdrop-blur-sm border border-white/5">
                                 <span className="flex items-center gap-2">
                                     <span className="material-symbols-outlined text-sm text-primary">edit</span>
-                                    {meta.author}
+                                    {post.author}
                                 </span>
                                 <span className="flex items-center gap-2">
                                     <span className="material-symbols-outlined text-sm text-primary">calendar_month</span>
@@ -106,11 +152,11 @@ export const Post = () => {
                 </div>
             </header>
 
-            {/* Conteúdo Principal MDX */}
+            {/* Conteúdo Principal do Supabase */}
             <main className="max-w-3xl mx-auto px-6 py-16 md:py-24 bg-white dark:bg-dark-bg w-full relative z-20">
-                <article className="prose-custom font-serif transition-all duration-300">
-                    {/* Renderizamos o componente MDX injetando nosso map de estilos tailwind */}
-                    <PostComponent components={mdxComponents} />
+                <article className="prose-custom font-serif transition-all duration-300 prose prose-invert dark:prose-invert max-w-none">
+                    {/* Renderizar conteúdo como HTML */}
+                    <div dangerouslySetInnerHTML={{ __html: post.content }} />
                 </article>
 
                 {/* Navegação Final de Artigo */}
