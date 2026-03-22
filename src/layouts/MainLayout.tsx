@@ -19,6 +19,7 @@ export const MainLayout = () => {
                     </button>
                     <Link onClick={() => setMobileMenuOpen(false)} to="/sobre-a-obra" className="text-2xl font-bold hover:text-primary transition-colors text-white">Sobre a Obra</Link>
                     <Link onClick={() => setMobileMenuOpen(false)} to="/artigos" className="text-2xl font-bold hover:text-primary transition-colors text-white">Artigos</Link>
+                    <Link onClick={() => setMobileMenuOpen(false)} to="/rede-de-tags" className="text-2xl font-bold hover:text-primary transition-colors text-white">Rede de Tags</Link>
                     <Link onClick={() => setMobileMenuOpen(false)} to="/sobre-o-autor" className="text-2xl font-bold hover:text-primary transition-colors text-white">Sobre o Autor</Link>
                 </div>
 
