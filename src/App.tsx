@@ -19,6 +19,7 @@ import { AboutBook } from './pages/AboutBook';
 import { AboutAuthor } from './pages/AboutAuthor';
 import { Post } from './pages/Post';
 import { Admin } from './pages/Admin';
+import { DynamicSection } from './pages/DynamicSection';
 
 const ProtectedRoute = ({ children, adminOnly = false }: { children: React.ReactNode; adminOnly?: boolean }) => {
   const { session, loading, user } = useAuth();
@@ -75,6 +76,7 @@ function App() {
                 {/* Rotas do Leitor (Públicas) */}
                 <Route element={<ReaderLayout />}>
                   <Route path="/capitulo/:id" element={<Chapter />} />
+                  <Route path="/capitulo/:chapterId/secao/:sectionId" element={<DynamicSection />} />
                 </Route>
 
                 {/* Rota 404 (fallback) */}
