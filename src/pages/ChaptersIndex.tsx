@@ -1,5 +1,5 @@
-import React, { useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useRef, useState, useMemo } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useChapters } from '../hooks/useChapters';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -8,8 +8,21 @@ export const ChaptersIndex = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
     const { chapters, loading: chaptersLoading } = useChapters();
+    const [searchParams] = useSearchParams();
+    const [activeTag, setActiveTag] = useState<string | null>(searchParams.get('tag'));
 
     const isAdmin = user?.user_metadata?.is_admin === true;
+
+    const allTags = useMemo(() => {
+        const set = new Set<string>();
+        chapters.forEach(c => (c.tags || []).forEach(t => set.add(t)));
+        return Array.from(set).sort();
+    }, [chapters]);
+
+    const visibleChapters = useMemo(
+        () => activeTag ? chapters.filter(c => c.tags?.includes(activeTag)) : chapters,
+        [chapters, activeTag]
+    );
 
     const scrollCarousel = (distance: number) => {
         if (scrollContainerRef.current) {
@@ -48,6 +61,35 @@ export const ChaptersIndex = () => {
                 )}
             </div>
 
+            {/* Tag Filter Bar */}
+            {!chaptersLoading && allTags.length > 0 && (
+                <div className="flex flex-wrap items-center gap-2 px-8 sm:px-20 mb-8">
+                    <button
+                        onClick={() => setActiveTag(null)}
+                        className={`px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-full transition-all border ${
+                            activeTag === null
+                                ? 'bg-primary text-white border-primary shadow-md shadow-primary/20'
+                                : 'bg-transparent text-slate-500 border-slate-200 dark:border-white/10 hover:border-primary/40 hover:text-primary'
+                        }`}
+                    >
+                        Todos
+                    </button>
+                    {allTags.map(tag => (
+                        <button
+                            key={tag}
+                            onClick={() => setActiveTag(activeTag === tag ? null : tag)}
+                            className={`px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-full transition-all border ${
+                                activeTag === tag
+                                    ? 'bg-primary text-white border-primary shadow-md shadow-primary/20'
+                                    : 'bg-transparent text-slate-500 border-slate-200 dark:border-white/10 hover:border-primary/40 hover:text-primary'
+                            }`}
+                        >
+                            #{tag}
+                        </button>
+                    ))}
+                </div>
+            )}
+
             {/* Carousel View */}
             <div className="relative group/carousel w-full">
                 {/* Navigation Buttons (Desktop) */}
@@ -83,7 +125,13 @@ export const ChaptersIndex = () => {
                         <div className="flex items-center justify-center w-full py-24">
                             <span className="material-symbols-outlined animate-spin text-4xl text-primary">sync</span>
                         </div>
-                    ) : chapters.map((chap) => (
+                    ) : visibleChapters.length === 0 && activeTag !== null ? (
+                        <div className="flex flex-col items-center justify-center w-full py-24 gap-3">
+                            <span className="material-symbols-outlined text-4xl text-slate-300 dark:text-slate-600">label_off</span>
+                            <p className="text-slate-500 text-sm">Nenhum capítulo com a tag <strong>#{activeTag}</strong>.</p>
+                            <button onClick={() => setActiveTag(null)} className="text-xs text-primary font-bold hover:underline">Ver todos</button>
+                        </div>
+                    ) : visibleChapters.map((chap) => (
                         <div
                             key={chap.id}
                             onClick={() => navigate(`/capitulo/${chap.order_num}`)}
@@ -99,7 +147,7 @@ export const ChaptersIndex = () => {
                                     <h3 className="chapter-title text-2xl font-bold leading-tight italic">{chap.title}</h3>
                                 </div>
                             </div>
-                            <div className="flex flex-col flex-1 p-6 gap-6">
+                            <div className="flex flex-col flex-1 p-6 gap-4">
                                 <p className="chapter-desc text-slate-600 dark:text-slate-400 text-sm leading-relaxed line-clamp-3">{chap.description}</p>
                                 <button className="w-full flex items-center justify-center gap-2 rounded-lg h-11 px-4 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-slate-100 hover:bg-primary hover:text-white transition-all text-sm font-bold mt-auto group">
                                     Explorar

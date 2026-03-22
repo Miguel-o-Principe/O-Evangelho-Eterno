@@ -133,6 +133,19 @@ export const DynamicChapter = () => {
                                     {chapter.read_time} min de leitura
                                 </span>
                             </div>
+                            {chapter.tags && chapter.tags.length > 0 && (
+                                <div className="flex flex-wrap justify-center gap-2 mt-6">
+                                    {chapter.tags.map(tag => (
+                                        <button
+                                            key={tag}
+                                            onClick={() => navigate(`/capitulos?tag=${tag}`)}
+                                            className="px-3 py-1 text-[10px] font-bold uppercase tracking-widest bg-white/10 text-white/60 rounded-full border border-white/10 backdrop-blur-sm hover:bg-white/20 hover:text-white transition-all"
+                                        >
+                                            #{tag}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

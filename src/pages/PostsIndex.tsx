@@ -1,16 +1,30 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useMemo } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { usePosts } from '../hooks/usePosts';
 
 export const PostsIndex = () => {
     const { posts, loading } = usePosts();
     const [searchTerm, setSearchTerm] = useState('');
+    const [searchParams] = useSearchParams();
+    const [activeTag, setActiveTag] = useState<string | null>(searchParams.get('tag'));
 
-    const filteredPosts = posts.filter(post =>
-        post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        post.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        post.author.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const allTags = useMemo(() => {
+        const set = new Set<string>();
+        posts.forEach(p => (p.tags || []).forEach(t => set.add(t)));
+        return Array.from(set).sort();
+    }, [posts]);
+
+    const filteredPosts = useMemo(() => posts.filter(post => {
+        const lo = searchTerm.toLowerCase();
+        const matchesSearch = !searchTerm || (
+            post.title.toLowerCase().includes(lo) ||
+            post.description.toLowerCase().includes(lo) ||
+            post.author.toLowerCase().includes(lo) ||
+            (post.tags || []).some(t => t.toLowerCase().includes(lo))
+        );
+        const matchesTag = !activeTag || (post.tags || []).includes(activeTag);
+        return matchesSearch && matchesTag;
+    }), [posts, searchTerm, activeTag]);
 
     return (
         <>
@@ -41,6 +55,35 @@ export const PostsIndex = () => {
                 </div>
             </div>
 
+            {/* Tag Filter Bar */}
+            {!loading && allTags.length > 0 && (
+                <div className="max-w-5xl mx-auto px-6 mb-10 flex flex-wrap items-center gap-2">
+                    <button
+                        onClick={() => setActiveTag(null)}
+                        className={`px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-full transition-all border ${
+                            activeTag === null
+                                ? 'bg-primary text-white border-primary shadow-md shadow-primary/20'
+                                : 'bg-transparent text-slate-500 border-slate-200 dark:border-white/10 hover:border-primary/40 hover:text-primary'
+                        }`}
+                    >
+                        Todos
+                    </button>
+                    {allTags.map(tag => (
+                        <button
+                            key={tag}
+                            onClick={() => setActiveTag(activeTag === tag ? null : tag)}
+                            className={`px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-full transition-all border ${
+                                activeTag === tag
+                                    ? 'bg-primary text-white border-primary shadow-md shadow-primary/20'
+                                    : 'bg-transparent text-slate-500 border-slate-200 dark:border-white/10 hover:border-primary/40 hover:text-primary'
+                            }`}
+                        >
+                            #{tag}
+                        </button>
+                    ))}
+                </div>
+            )}
+
             {/* Posts Grid */}
             <main className="max-w-5xl mx-auto px-6 pb-24">
                 {loading ? (
@@ -54,6 +97,11 @@ export const PostsIndex = () => {
                         <p className="text-slate-500 dark:text-slate-400">
                             {posts.length === 0 ? 'Nenhum artigo publicado ainda.' : 'Nenhum artigo corresponde aos seus critérios de busca.'}
                         </p>
+                        {activeTag && (
+                            <button onClick={() => setActiveTag(null)} className="mt-4 text-sm text-primary font-bold hover:underline">
+                                Limpar filtro #{activeTag}
+                            </button>
+                        )}
                     </div>
                 ) : (
                     <div className="grid gap-8 md:gap-12">

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useSection } from '../hooks/useChapterSections';
@@ -54,6 +54,7 @@ const markdownComponents: any = {
 
 export const DynamicSection = () => {
     const { chapterId, sectionId } = useParams<{ chapterId: string; sectionId: string }>();
+    const navigate = useNavigate();
     const { section, chapterImageUrl, chapterOrderNum, prevSection, nextSection, loading, error } = useSection(sectionId || null);
 
     if (loading) {
@@ -138,6 +139,19 @@ export const DynamicSection = () => {
                                     {section.read_time} min de leitura
                                 </span>
                             </div>
+                            {section.tags && section.tags.length > 0 && (
+                                <div className="flex flex-wrap justify-center gap-2 mt-6">
+                                    {section.tags.map(tag => (
+                                        <button
+                                            key={tag}
+                                            onClick={() => navigate(`/capitulos?tag=${tag}`)}
+                                            className="px-3 py-1 text-[10px] font-bold uppercase tracking-widest bg-white/10 text-white/60 rounded-full border border-white/10 backdrop-blur-sm hover:bg-white/20 hover:text-white transition-all"
+                                        >
+                                            #{tag}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

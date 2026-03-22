@@ -6,24 +6,25 @@ import { useChapters, ChapterSummary } from '../hooks/useChapters';
 import { useAllSectionsGrouped, SectionSummary } from '../hooks/useChapterSections';
 import { usePosts, PostMeta } from '../hooks/usePosts';
 import { supabase } from '../lib/supabase';
+import { TagInput } from '../components/TagInput';
 
 // ─── Form types ────────────────────────────────────────────────────────────────
 interface ChapterForm {
     order_num: number; title: string; subtitle: string; tag_line: string;
-    image_url: string; description: string; content: string; read_time: number; published: boolean;
+    image_url: string; description: string; content: string; read_time: number; published: boolean; tags: string[];
 }
 interface SectionForm {
     chapter_id: string; order_num: number; title: string; subtitle: string; tag_line: string;
-    description: string; content: string; read_time: number; published: boolean;
+    description: string; content: string; read_time: number; published: boolean; tags: string[];
 }
 interface PostForm {
     title: string; description: string; author: string; slug: string;
-    content: string; cover_image: string; read_time: number; published: boolean;
+    content: string; cover_image: string; read_time: number; published: boolean; tags: string[];
 }
 
-const emptyChapterForm: ChapterForm = { order_num: 0, title: '', subtitle: '', tag_line: '', image_url: '', description: '', content: '', read_time: 30, published: false };
-const emptySectionForm: SectionForm = { chapter_id: '', order_num: 1, title: '', subtitle: '', tag_line: '', description: '', content: '', read_time: 15, published: false };
-const emptyPostForm: PostForm = { title: '', description: '', author: '', slug: '', content: '', cover_image: '', read_time: 15, published: true };
+const emptyChapterForm: ChapterForm = { order_num: 0, title: '', subtitle: '', tag_line: '', image_url: '', description: '', content: '', read_time: 30, published: false, tags: [] };
+const emptySectionForm: SectionForm = { chapter_id: '', order_num: 1, title: '', subtitle: '', tag_line: '', description: '', content: '', read_time: 15, published: false, tags: [] };
+const emptyPostForm: PostForm = { title: '', description: '', author: '', slug: '', content: '', cover_image: '', read_time: 15, published: true, tags: [] };
 
 type EditMode = 'chapter' | 'section' | 'post' | null;
 
@@ -97,7 +98,7 @@ export const Admin = () => {
         setEditingChapterId(chap.id);
         setEditingSectionId(null);
         const { data } = await supabase.from('chapters').select('*').eq('id', chap.id).single();
-        if (data) setChapterForm({ order_num: data.order_num, title: data.title, subtitle: data.subtitle, tag_line: data.tag_line, image_url: data.image_url, description: data.description, content: data.content, read_time: data.read_time, published: data.published });
+        if (data) setChapterForm({ order_num: data.order_num, title: data.title, subtitle: data.subtitle, tag_line: data.tag_line, image_url: data.image_url, description: data.description, content: data.content, read_time: data.read_time, published: data.published, tags: data.tags || [] });
     };
 
     const startCreateChapter = () => {
@@ -129,7 +130,7 @@ export const Admin = () => {
         setEditingSectionId(sec.id);
         setEditingChapterId(null);
         const { data } = await supabase.from('chapter_sections').select('*').eq('id', sec.id).single();
-        if (data) setSectionForm({ chapter_id: data.chapter_id, order_num: data.order_num, title: data.title, subtitle: data.subtitle, tag_line: data.tag_line, description: data.description, content: data.content, read_time: data.read_time, published: data.published });
+        if (data) setSectionForm({ chapter_id: data.chapter_id, order_num: data.order_num, title: data.title, subtitle: data.subtitle, tag_line: data.tag_line, description: data.description, content: data.content, read_time: data.read_time, published: data.published, tags: data.tags || [] });
     };
 
     const startCreateSection = (chap: ChapterSummary) => {
@@ -176,6 +177,7 @@ export const Admin = () => {
                 cover_image: data.cover_image,
                 read_time: data.read_time,
                 published: data.published,
+                tags: data.tags || [],
             });
         }
     };
@@ -202,6 +204,7 @@ export const Admin = () => {
                 cover_image: postForm.cover_image,
                 read_time: postForm.read_time,
                 published: postForm.published,
+                tags: postForm.tags,
             }).eq('id', editingPostId);
             setSaveMsg(error ? '❌ ' + error.message : '✅ Salvo!');
         } else {
@@ -214,6 +217,7 @@ export const Admin = () => {
                 cover_image: postForm.cover_image,
                 read_time: postForm.read_time,
                 published: postForm.published,
+                tags: postForm.tags,
                 date: new Date().toISOString(),
             });
             setSaveMsg(error ? '❌ ' + error.message : '✅ Artigo criado!');
@@ -356,7 +360,7 @@ export const Admin = () => {
                                                         </div>
                                                         <div className="flex-1 min-w-0">
                                                             <div className="flex items-center gap-1.5 flex-wrap">
-                                                                <span className="text-[8px] font-bold uppercase tracking-widest text-primary/80">SeÃ§. {String(sec.order_num).padStart(2, '0')}</span>
+                                                                <span className="text-[8px] font-bold uppercase tracking-widest text-primary/80">Seç. {String(sec.order_num).padStart(2, '0')}</span>
                                                                 <span className={`text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full ${sec.published ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400'}`}>
                                                                     {sec.published ? 'Publicado' : 'Rascunho'}
                                                                 </span>
@@ -501,6 +505,10 @@ export const Admin = () => {
                                     <MDEditor value={chapterForm.content} onChange={val => setChapterForm({ ...chapterForm, content: val || '' })} height={400} preview="edit" />
                                 </div>
                             </div>
+                            <div>
+                                <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Tags</label>
+                                <TagInput tags={chapterForm.tags} onChange={v => setChapterForm({ ...chapterForm, tags: v })} />
+                            </div>
                             <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
                                 <div><p className="font-bold text-sm">Publicado</p><p className="text-[11px] text-slate-500">Visível publicamente</p></div>
                                 <Toggle value={chapterForm.published} onChange={v => setChapterForm({ ...chapterForm, published: v })} />
@@ -533,6 +541,10 @@ export const Admin = () => {
                                     <MDEditor value={sectionForm.content} onChange={val => setSectionForm({ ...sectionForm, content: val || '' })} height={400} preview="edit" />
                                 </div>
                             </div>
+                            <div>
+                                <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Tags</label>
+                                <TagInput tags={sectionForm.tags} onChange={v => setSectionForm({ ...sectionForm, tags: v })} />
+                            </div>
                             <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
                                 <div><p className="font-bold text-sm">Publicado</p><p className="text-[11px] text-slate-500">Visível publicamente</p></div>
                                 <Toggle value={sectionForm.published} onChange={v => setSectionForm({ ...sectionForm, published: v })} />
@@ -560,6 +572,10 @@ export const Admin = () => {
                                 <div data-color-mode="auto" className="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700">
                                     <MDEditor value={postForm.content} onChange={val => setPostForm({ ...postForm, content: val || '' })} height={400} preview="edit" />
                                 </div>
+                            </div>
+                            <div>
+                                <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Tags</label>
+                                <TagInput tags={postForm.tags} onChange={v => setPostForm({ ...postForm, tags: v })} />
                             </div>
                             <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
                                 <div><p className="font-bold text-sm">Publicado</p><p className="text-[11px] text-slate-500">Visível na página de artigos</p></div>

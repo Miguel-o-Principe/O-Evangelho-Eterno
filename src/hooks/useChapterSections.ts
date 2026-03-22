@@ -12,6 +12,7 @@ export interface ChapterSection {
     content: string;
     read_time: number;
     published: boolean;
+    tags: string[];
     created_at: string;
     updated_at: string;
 }
@@ -29,7 +30,7 @@ export function useChapterSections(chapterId: string | null, includeUnpublished 
         setLoading(true);
         let query = supabase
             .from('chapter_sections')
-            .select('id, chapter_id, order_num, title, subtitle, tag_line, description, read_time, published, created_at, updated_at')
+            .select('id, chapter_id, order_num, title, subtitle, tag_line, description, read_time, published, tags, created_at, updated_at')
             .eq('chapter_id', chapterId)
             .order('order_num', { ascending: true });
 
@@ -37,9 +38,21 @@ export function useChapterSections(chapterId: string | null, includeUnpublished 
             query = query.eq('published', true);
         }
 
-        query.then(({ data, error }) => {
-            if (error) setError(error.message);
-            else setSections(data || []);
+        query.then(async ({ data, error }) => {
+            if (error?.code === '42703') {
+                let fb = supabase
+                    .from('chapter_sections')
+                    .select('id, chapter_id, order_num, title, subtitle, tag_line, description, read_time, published, created_at, updated_at')
+                    .eq('chapter_id', chapterId!)
+                    .order('order_num', { ascending: true });
+                if (!includeUnpublished) fb = fb.eq('published', true);
+                const { data: fd } = await fb;
+                setSections((fd || []).map((s: any) => ({ ...s, tags: [] })));
+            } else if (error) {
+                setError(error.message);
+            } else {
+                setSections((data || []).map(s => ({ ...s, tags: s.tags || [] })));
+            }
             setLoading(false);
         });
     }, [chapterId, includeUnpublished]);
@@ -55,7 +68,7 @@ export function useAllSectionsGrouped(includeUnpublished = true) {
     useEffect(() => {
         let query = supabase
             .from('chapter_sections')
-            .select('id, chapter_id, order_num, title, subtitle, tag_line, description, read_time, published, created_at, updated_at')
+            .select('id, chapter_id, order_num, title, subtitle, tag_line, description, read_time, published, tags, created_at, updated_at')
             .order('chapter_id')
             .order('order_num', { ascending: true });
 
@@ -63,9 +76,22 @@ export function useAllSectionsGrouped(includeUnpublished = true) {
             query = query.eq('published', true);
         }
 
-        query.then(({ data }) => {
+        query.then(async ({ data, error: qErr }) => {
+            let rows: any[] = data || [];
+            if (qErr?.code === '42703') {
+                let fb = supabase
+                    .from('chapter_sections')
+                    .select('id, chapter_id, order_num, title, subtitle, tag_line, description, read_time, published, created_at, updated_at')
+                    .order('chapter_id')
+                    .order('order_num', { ascending: true });
+                if (!includeUnpublished) fb = fb.eq('published', true);
+                const { data: fd } = await fb;
+                rows = (fd || []).map((s: any) => ({ ...s, tags: [] }));
+            } else {
+                rows = rows.map(s => ({ ...s, tags: s.tags || [] }));
+            }
             const map: Record<string, SectionSummary[]> = {};
-            (data || []).forEach(s => {
+            rows.forEach(s => {
                 if (!map[s.chapter_id]) map[s.chapter_id] = [];
                 map[s.chapter_id].push(s);
             });

@@ -12,6 +12,7 @@ export interface Chapter {
     content: string;
     read_time: number;
     published: boolean;
+    tags: string[];
     created_at: string;
     updated_at: string;
 }

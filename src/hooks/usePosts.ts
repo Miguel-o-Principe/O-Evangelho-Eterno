@@ -12,6 +12,7 @@ export interface PostMeta {
     readTime: number;
     content: string;
     published: boolean;
+    tags: string[];
 }
 
 export function usePosts(includeUnpublished: boolean = false) {
@@ -45,6 +46,7 @@ export function usePosts(includeUnpublished: boolean = false) {
                     readTime: post.read_time,
                     content: post.content,
                     published: post.published,
+                    tags: post.tags || [],
                 }));
 
                 setPosts(formattedPosts);
