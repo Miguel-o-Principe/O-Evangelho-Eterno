@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useChapters, ChapterSummary } from '../hooks/useChapters';
 import { useAllSectionsGrouped, SectionSummary } from '../hooks/useChapterSections';
+import { usePosts, PostMeta } from '../hooks/usePosts';
 
 // ─── Form types ────────────────────────────────────────────────────────────────
 interface ChapterForm {
@@ -15,11 +16,16 @@ interface SectionForm {
     chapter_id: string; order_num: number; title: string; subtitle: string; tag_line: string;
     description: string; content: string; read_time: number; published: boolean;
 }
+interface PostForm {
+    title: string; description: string; author: string; slug: string;
+    content: string; cover_image: string; read_time: number; published: boolean;
+}
 
 const emptyChapterForm: ChapterForm = { order_num: 0, title: '', subtitle: '', tag_line: '', image_url: '', description: '', content: '', read_time: 30, published: false };
 const emptySectionForm: SectionForm = { chapter_id: '', order_num: 1, title: '', subtitle: '', tag_line: '', description: '', content: '', read_time: 15, published: false };
+const emptyPostForm: PostForm = { title: '', description: '', author: '', slug: '', content: '', cover_image: '', read_time: 15, published: true };
 
-type EditMode = 'chapter' | 'section' | null;
+type EditMode = 'chapter' | 'section' | 'post' | null;
 
 // ─── Shared Form Panel ─────────────────────────────────────────────────────────
 const FormPanel = ({ title, onClose, onSave, saving, saveMsg, children }: { title: string; onClose: () => void; onSave: () => void; saving: boolean; saveMsg: string; children: React.ReactNode; }) => (
@@ -68,16 +74,19 @@ export const Admin = () => {
     const navigate = useNavigate();
     const { chapters, loading: chapLoading } = useChapters(true);
     const { sectionsMap, loading: secLoading } = useAllSectionsGrouped(true);
+    const { posts, loading: postsLoading } = usePosts(true);
 
     const [expandedChapter, setExpandedChapter] = useState<string | null>(null);
     const [editMode, setEditMode] = useState<EditMode>(null);
     const [editingChapterId, setEditingChapterId] = useState<string | null>(null);
     const [editingSectionId, setEditingSectionId] = useState<string | null>(null);
+    const [editingPostId, setEditingPostId] = useState<string | null>(null);
     const [chapterForm, setChapterForm] = useState<ChapterForm>(emptyChapterForm);
     const [sectionForm, setSectionForm] = useState<SectionForm>(emptySectionForm);
+    const [postForm, setPostForm] = useState<PostForm>(emptyPostForm);
     const [saving, setSaving] = useState(false);
     const [saveMsg, setSaveMsg] = useState('');
-    const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; type: 'chapter' | 'section' } | null>(null);
+    const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; type: 'chapter' | 'section' | 'post' } | null>(null);
 
     const isAdmin = user?.user_metadata?.is_admin === true;
     useEffect(() => { if (!isAdmin) navigate('/'); }, [isAdmin, navigate]);
@@ -148,22 +157,87 @@ export const Admin = () => {
         if (!saving) setTimeout(() => window.location.reload(), 1200);
     };
 
-    const cancelEdit = () => { setEditMode(null); setEditingChapterId(null); setEditingSectionId(null); setSaveMsg(''); };
+    const cancelEdit = () => { setEditMode(null); setEditingChapterId(null); setEditingSectionId(null); setEditingPostId(null); setSaveMsg(''); };
 
-    const togglePublished = async (id: string, table: 'chapters' | 'chapter_sections', current: boolean) => {
+    // ── Edit post ──
+    const startEditPost = async (post: PostMeta) => {
+        setEditMode('post');
+        setEditingPostId(post.id);
+        setEditingChapterId(null);
+        setEditingSectionId(null);
+        const { data } = await supabase.from('posts').select('*').eq('id', post.id).single();
+        if (data) {
+            setPostForm({
+                title: data.title,
+                description: data.description,
+                author: data.author,
+                slug: data.slug,
+                content: data.content,
+                cover_image: data.cover_image,
+                read_time: data.read_time,
+                published: data.published,
+            });
+        }
+    };
+
+    const startCreatePost = () => {
+        setEditMode('post');
+        setEditingPostId(null);
+        setEditingChapterId(null);
+        setEditingSectionId(null);
+        setPostForm(emptyPostForm);
+        setSaveMsg('');
+    };
+
+    const savePost = async () => {
+        setSaving(true);
+        setSaveMsg('');
+        if (editingPostId) {
+            const { error } = await supabase.from('posts').update({
+                title: postForm.title,
+                description: postForm.description,
+                author: postForm.author,
+                slug: postForm.slug,
+                content: postForm.content,
+                cover_image: postForm.cover_image,
+                read_time: postForm.read_time,
+                published: postForm.published,
+            }).eq('id', editingPostId);
+            setSaveMsg(error ? '❌ ' + error.message : '✅ Salvo!');
+        } else {
+            const { error } = await supabase.from('posts').insert({
+                title: postForm.title,
+                description: postForm.description,
+                author: postForm.author,
+                slug: postForm.slug,
+                content: postForm.content,
+                cover_image: postForm.cover_image,
+                read_time: postForm.read_time,
+                published: postForm.published,
+                date: new Date().toISOString(),
+            });
+            setSaveMsg(error ? '❌ ' + error.message : '✅ Artigo criado!');
+            if (!error) { cancelEdit(); }
+        }
+        setSaving(false);
+        if (!saving) setTimeout(() => window.location.reload(), 1200);
+    };
+
+    const togglePublished = async (id: string, table: 'chapters' | 'chapter_sections' | 'posts', current: boolean) => {
         await supabase.from(table).update({ published: !current }).eq('id', id);
         window.location.reload();
     };
 
     const handleDelete = async () => {
         if (!deleteConfirm) return;
-        const table = deleteConfirm.type === 'chapter' ? 'chapters' : 'chapter_sections';
+        const table = deleteConfirm.type === 'chapter' ? 'chapters' : deleteConfirm.type === 'section' ? 'chapter_sections' : 'posts';
         await supabase.from(table).delete().eq('id', deleteConfirm.id);
         setDeleteConfirm(null);
         window.location.reload();
     };
 
     const showForm = editMode !== null;
+    const currentTab = editMode === 'post' ? 'posts' : editMode ? 'chapters' : 'chapters';
 
     return (
         <div className="min-h-screen bg-background-light dark:bg-dark-bg text-slate-800 dark:text-slate-100">
@@ -176,20 +250,50 @@ export const Admin = () => {
                         </button>
                         <div>
                             <h1 className="font-bold text-lg leading-tight">Painel Admin</h1>
-                            <p className="text-[10px] uppercase tracking-widest text-slate-500">Gerenciar Capítulos e Seções</p>
+                            <p className="text-[10px] uppercase tracking-widest text-slate-500">Gerenciar Capítulos, Seções e Artigos</p>
                         </div>
                     </div>
-                    <button onClick={startCreateChapter} className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:brightness-110 transition-all text-sm">
-                        <span className="material-symbols-outlined text-lg">add</span>
-                        Novo Capítulo
-                    </button>
+                    <div className="flex items-center gap-2">
+                        {editMode === 'post' ? (
+                            <button onClick={startCreatePost} className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:brightness-110 transition-all text-sm">
+                                <span className="material-symbols-outlined text-lg">add</span>
+                                Novo Artigo
+                            </button>
+                        ) : (
+                            <button onClick={startCreateChapter} className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:brightness-110 transition-all text-sm">
+                                <span className="material-symbols-outlined text-lg">add</span>
+                                Novo Capítulo
+                            </button>
+                        )}
+                    </div>
                 </div>
             </header>
 
-            <div className="max-w-7xl mx-auto px-6 py-12">
+            {/* Tabs */}
+            <div className="border-b border-slate-200 dark:border-white/5 sticky top-16 z-30 bg-background-light dark:bg-dark-bg">
+                <div className="max-w-7xl mx-auto px-6 flex gap-8">
+                    <button
+                        onClick={() => { setEditMode(null); setEditingChapterId(null); setEditingSectionId(null); setEditingPostId(null); }}
+                        className={`py-4 px-2 font-bold text-sm uppercase tracking-widest border-b-2 transition-all ${editMode !== 'post' ? 'border-primary text-primary' : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                    >
+                        <span className="material-symbols-outlined inline mr-2 text-base align-middle">menu_book</span>
+                        Capítulos & Seções ({chapters.length})
+                    </button>
+                    <button
+                        onClick={() => { setEditMode('post'); setEditingChapterId(null); setEditingSectionId(null); setEditingPostId(null); }}
+                        className={`py-4 px-2 font-bold text-sm uppercase tracking-widest border-b-2 transition-all ${editMode === 'post' ? 'border-primary text-primary' : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                    >
+                        <span className="material-symbols-outlined inline mr-2 text-base align-middle">article</span>
+                        Artigos ({posts.length})
+                    </button>
+                </div>
+            </div>
+
+            
                 <div className={`grid ${showForm ? 'grid-cols-1 xl:grid-cols-2' : 'grid-cols-1'} gap-8`}>
 
                     {/* ── Chapter + Sections List ── */}
+                    {editMode !== 'post' && (
                     <div className="space-y-2">
                         <h2 className="text-sm font-bold uppercase tracking-widest text-slate-500 mb-6">{chapters.length} Capítulos</h2>
 
@@ -315,6 +419,75 @@ export const Admin = () => {
                             );
                         })}
                     </div>
+                    )}
+
+                    {/* ── Posts List ── */}
+                    {editMode === 'post' && (
+                    <div className="space-y-2">
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-sm font-bold uppercase tracking-widest text-slate-500">{posts.length} Artigos</h2>
+                            <button onClick={startCreatePost} className="flex items-center gap-2 px-3 py-1.5 bg-primary text-white font-bold rounded-lg text-xs hover:brightness-110 transition-all">
+                                <span className="material-symbols-outlined text-sm">add</span>
+                                Novo
+                            </button>
+                        </div>
+
+                        {postsLoading ? (
+                            <div className="flex justify-center py-12">
+                                <span className="material-symbols-outlined animate-spin text-4xl text-primary">sync</span>
+                            </div>
+                        ) : posts.length === 0 ? (
+                            <div className="p-8 text-center rounded-xl border border-dashed border-slate-200 dark:border-white/5">
+                                <p className="text-slate-500">Nenhum artigo ainda.</p>
+                            </div>
+                        ) : posts.map((post) => {
+                            const isEditingThis = editingPostId === post.id;
+                            return (
+                                <div
+                                    key={post.id}
+                                    className={`flex items-center gap-4 p-4 rounded-2xl border transition-all ${isEditingThis ? 'border-primary bg-primary/5 dark:bg-primary/10' : 'border-slate-200 dark:border-white/5 bg-white dark:bg-card-dark'}`}
+                                >
+                                    {post.coverImage && (
+                                        <div className="size-16 rounded-xl overflow-hidden shrink-0">
+                                            <img src={post.coverImage} alt="" className="w-full h-full object-cover" />
+                                        </div>
+                                    )}
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2 flex-wrap mb-1">
+                                            <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full ${post.published ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'}`}>
+                                                {post.published ? 'Publicado' : 'Rascunho'}
+                                            </span>
+                                            <span className="text-[9px] text-slate-400">{post.readTime} min</span>
+                                        </div>
+                                        <p className="font-bold text-sm truncate">{post.title}</p>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{post.author}</p>
+                                    </div>
+                                    <div className="flex items-center gap-1 shrink-0">
+                                        <button onClick={() => togglePublished(post.id, 'posts', post.published)} title={post.published ? 'Despublicar' : 'Publicar'} className="p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-colors">
+                                            <span className="material-symbols-outlined text-sm">{post.published ? 'visibility_off' : 'visibility'}</span>
+                                        </button>
+                                        <button onClick={() => startEditPost(post)} title="Editar" className="p-2 hover:bg-primary/10 text-primary rounded-lg transition-colors">
+                                            <span className="material-symbols-outlined text-sm">edit</span>
+                                        </button>
+                                        <button onClick={() => navigate(`/post/${post.slug}`)} title="Visualizar" className="p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-colors">
+                                            <span className="material-symbols-outlined text-sm">open_in_new</span>
+                                        </button>
+                                        {deleteConfirm?.id === post.id ? (
+                                            <>
+                                                <button onClick={handleDelete} className="px-2 py-1 bg-red-500 text-white text-[9px] font-bold rounded-lg hover:bg-red-600 transition-colors">Confirmar</button>
+                                                <button onClick={() => setDeleteConfirm(null)} className="px-2 py-1 text-[9px] font-bold rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">✕</button>
+                                            </>
+                                        ) : (
+                                            <button onClick={() => setDeleteConfirm({ id: post.id, type: 'post' })} title="Excluir" className="p-2 hover:bg-red-50 dark:hover:bg-red-500/10 text-slate-400 hover:text-red-500 rounded-lg transition-colors">
+                                                <span className="material-symbols-outlined text-sm">delete</span>
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                    )}
 
                     {/* ── Edit Form Panel ── */}
                     {showForm && editMode === 'chapter' && (
@@ -374,6 +547,34 @@ export const Admin = () => {
                             <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
                                 <div><p className="font-bold text-sm">Publicado</p><p className="text-[11px] text-slate-500">Visível publicamente</p></div>
                                 <Toggle value={sectionForm.published} onChange={v => setSectionForm({ ...sectionForm, published: v })} />
+                            </div>
+                        </FormPanel>
+                    )}
+
+                    {showForm && editMode === 'post' && (
+                        <FormPanel title={editingPostId ? 'Editar Artigo' : 'Novo Artigo'} onClose={cancelEdit} onSave={savePost} saving={saving} saveMsg={saveMsg}>
+                            <Field label="Título" value={postForm.title} onChange={v => setPostForm({ ...postForm, title: v })} placeholder="Título do artigo" />
+                            <Field label="Slug (URL amigável)" value={postForm.slug} onChange={v => setPostForm({ ...postForm, slug: v.toLowerCase().replace(/[^\w-]/g, '-') })} placeholder="titulo-do-artigo" />
+                            <Field label="Autor" value={postForm.author} onChange={v => setPostForm({ ...postForm, author: v })} placeholder="Miguel, o Príncipe" />
+                            <Field label="URL da Imagem de Capa" value={postForm.cover_image} onChange={v => setPostForm({ ...postForm, cover_image: v })} placeholder="/images/capitulo-1-bg.png" />
+                            {postForm.cover_image && <img src={postForm.cover_image} alt="Preview" className="h-20 w-full object-cover rounded-xl" />}
+                            <div className="grid grid-cols-2 gap-4">
+                                <Field label="Tempo de leitura (min)" value={postForm.read_time} onChange={v => setPostForm({ ...postForm, read_time: parseInt(v) || 15 })} type="number" />
+                            </div>
+                            <div>
+                                <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Descrição (resumo)</label>
+                                <textarea value={postForm.description} onChange={e => setPostForm({ ...postForm, description: e.target.value })} rows={2}
+                                    className="w-full px-4 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-primary/30 resize-none" />
+                            </div>
+                            <div>
+                                <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Conteúdo (Markdown/HTML)</label>
+                                <div data-color-mode="auto" className="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700">
+                                    <MDEditor value={postForm.content} onChange={val => setPostForm({ ...postForm, content: val || '' })} height={400} preview="edit" />
+                                </div>
+                            </div>
+                            <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+                                <div><p className="font-bold text-sm">Publicado</p><p className="text-[11px] text-slate-500">Visível na página de artigos</p></div>
+                                <Toggle value={postForm.published} onChange={v => setPostForm({ ...postForm, published: v })} />
                             </div>
                         </FormPanel>
                     )}

@@ -2,7 +2,8 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-    --color-primary: #d4a84b;
+    --color-primary: #1a2744;
+    --color-secondary: #d4a84b;
     --color-primary-dark: #1a2744;
     --color-accent: #d4a84b;
     --color-background-light: #f5e6c8;
@@ -41,17 +42,17 @@ body.sepia {
 }
 
 .sepia .table-container {
-    border-color: #d4a84b33;
+    border-color: color-mix(in srgb, var(--color-secondary) 20%, transparent);
 }
 
 .sepia th {
     background-color: #f5e6c8;
-    border-color: #d4a84b33;
+    border-color: color-mix(in srgb, var(--color-secondary) 20%, transparent);
     color: var(--color-sepia-text);
 }
 
 .sepia td {
-    border-color: #d4a84b22;
+    border-color: color-mix(in srgb, var(--color-secondary) 13%, transparent);
     color: var(--color-sepia-text);
 }
 
@@ -119,12 +120,12 @@ body.sepia {
     margin: 3.5rem 0;
     overflow-x: auto;
     border-radius: 1.25rem;
-    border: 1px solid #d4a84b33;
+    border: 1px solid color-mix(in srgb, var(--color-secondary) 20%, transparent);
     background: rgba(245, 230, 200, 0.4);
 }
 
 .dark .table-container {
-    border-color: #d4a84b22;
+    border-color: color-mix(in srgb, var(--color-secondary) 13%, transparent);
     background: rgba(26, 39, 68, 0.5);
 }
 
@@ -141,26 +142,26 @@ th {
     padding: 1.25rem 1rem;
     background-color: #f5e6c8;
     font-weight: 700;
-    border-bottom: 2px solid #d4a84b44;
+    border-bottom: 2px solid color-mix(in srgb, var(--color-secondary) 27%, transparent);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: #8b7355;
 }
 
 .dark th {
-    background-color: #1a2744;
-    border-bottom-color: #d4a84b33;
-    color: #d4a84b99;
+    background-color: var(--color-primary);
+    border-bottom-color: color-mix(in srgb, var(--color-secondary) 20%, transparent);
+    color: color-mix(in srgb, var(--color-secondary) 60%, transparent);
 }
 
 td {
     padding: 1.25rem 1rem;
-    border-bottom: 1px solid #d4a84b22;
+    border-bottom: 1px solid color-mix(in srgb, var(--color-secondary) 13%, transparent);
     vertical-align: top;
 }
 
 .dark td {
-    border-bottom-color: #d4a84b18;
+    border-bottom-color: color-mix(in srgb, var(--color-secondary) 9%, transparent);
 }
 
 tr:last-child td {

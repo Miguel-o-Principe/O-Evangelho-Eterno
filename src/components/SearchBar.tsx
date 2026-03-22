@@ -1,13 +1,12 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { usePosts } from '../hooks/usePosts';
 import { useChapters } from '../hooks/useChapters';
 
 interface SearchResult {
     id: string;
     title: string;
     description?: string;
-    type: 'chapter' | 'post';
+    type: 'chapter';
     link: string;
     category?: string;
 }
@@ -17,7 +16,6 @@ export const SearchBar: React.FC<{ compact?: boolean }> = ({ compact = false }) 
     const [results, setResults] = useState<SearchResult[]>([]);
     const [isOpen, setIsOpen] = useState(false);
     const { chapters } = useChapters();
-    const { posts } = usePosts();
 
     const handleSearch = useCallback((term: string) => {
         setSearchTerm(term);
@@ -48,28 +46,10 @@ export const SearchBar: React.FC<{ compact?: boolean }> = ({ compact = false }) 
             }
         });
 
-        // Search in posts
-        posts.forEach(post => {
-            if (
-                post.title.toLowerCase().includes(lowerTerm) ||
-                (post.description && post.description.toLowerCase().includes(lowerTerm)) ||
-                (post.author && post.author.toLowerCase().includes(lowerTerm))
-            ) {
-                searchResults.push({
-                    id: post.slug,
-                    title: post.title,
-                    description: post.description,
-                    type: 'post',
-                    link: `/post/${post.slug}`,
-                    category: 'Artigo'
-                });
-            }
-        });
-
         // Limit to 8 results
         setResults(searchResults.slice(0, 8));
         setIsOpen(true);
-    }, [chapters, posts]);
+    }, [chapters]);
 
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
@@ -82,9 +62,7 @@ export const SearchBar: React.FC<{ compact?: boolean }> = ({ compact = false }) 
         return () => document.removeEventListener('click', handleClickOutside);
     }, []);
 
-    const getIcon = (type: string) => {
-        return type === 'chapter' ? 'menu_book' : 'article';
-    };
+    const getIcon = () => 'menu_book';
 
     if (compact) {
         return (
@@ -93,7 +71,7 @@ export const SearchBar: React.FC<{ compact?: boolean }> = ({ compact = false }) 
                     <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
                     <input
                         type="text"
-                        placeholder="Buscar capítulos, artigos..."
+                        placeholder="Buscar capítulos..."
                         value={searchTerm}
                         onChange={(e) => handleSearch(e.target.value)}
                         onFocus={() => searchTerm && setIsOpen(true)}
@@ -111,7 +89,7 @@ export const SearchBar: React.FC<{ compact?: boolean }> = ({ compact = false }) 
                                 onClick={() => { setIsOpen(false); setSearchTerm(''); }}
                                 className="flex items-start gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors border-b border-slate-100 dark:border-slate-800 last:border-0"
                             >
-                                <span className="material-symbols-outlined text-slate-400 text-lg shrink-0">{getIcon(result.type)}</span>
+                                <span className="material-symbols-outlined text-slate-400 text-lg shrink-0">{getIcon()}</span>
                                 <div className="flex-1 min-w-0">
                                     <p className="text-sm font-medium text-slate-900 dark:text-white truncate">{result.title}</p>
                                     {result.description && (
@@ -141,7 +119,7 @@ export const SearchBar: React.FC<{ compact?: boolean }> = ({ compact = false }) 
                 <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-2xl">search</span>
                 <input
                     type="text"
-                    placeholder="Buscar por título, autor, assunto..."
+                    placeholder="Buscar capítulos..."
                     value={searchTerm}
                     onChange={(e) => handleSearch(e.target.value)}
                     autoFocus
@@ -162,7 +140,7 @@ export const SearchBar: React.FC<{ compact?: boolean }> = ({ compact = false }) 
                                     className="p-6 bg-white dark:bg-card-dark rounded-xl border border-slate-100 dark:border-slate-800 hover:shadow-lg hover:border-primary/30 transition-all group"
                                 >
                                     <div className="flex items-start gap-4">
-                                        <span className="material-symbols-outlined text-primary text-2xl">{getIcon(result.type)}</span>
+                                        <span className="material-symbols-outlined text-primary text-2xl">{getIcon()}</span>
                                         <div className="flex-1">
                                             <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors mb-2">
                                                 {result.title}
@@ -181,7 +159,7 @@ export const SearchBar: React.FC<{ compact?: boolean }> = ({ compact = false }) 
                         <div className="text-center py-16">
                             <span className="material-symbols-outlined text-6xl text-slate-300 dark:text-slate-700 mb-4 block">search_off</span>
                             <h3 className="text-xl font-bold mb-2">Nenhum resultado encontrado</h3>
-                            <p className="text-slate-500 dark:text-slate-400">Tente procurar por outros termos ou navegue pelos capítulos e artigos.</p>
+                            <p className="text-slate-500 dark:text-slate-400">Tente procurar por outros termos ou navegue pelos capítulos.</p>
                         </div>
                     )}
                 </div>
