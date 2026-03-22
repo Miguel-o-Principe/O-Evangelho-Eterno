@@ -8,7 +8,7 @@ export const AboutBook = () => {
             <ChapterMeta
                 title="Sobre a Obra"
                 description="Uma análise interdisciplinar de O Evangelho Eterno e a Ciência da Graça — Psicanálise Lacaniana, Teologia Bíblica, Cosmologia Quântica e Filosofia Existencialista."
-                image="/images/livro-3d.png"
+                image="/images/capa.jpg"
             />
             <style>{`
                 .text-gradient {
@@ -40,7 +40,7 @@ export const AboutBook = () => {
                         </p>
                     </div>
                     <div className="w-48 lg:w-1/3 shrink-0">
-                        <img src="/images/livro-3d.png" alt="Capa do Livro" className="w-full rounded-xl shadow-2xl rotate-2 hover:rotate-0 transition-transform duration-500" />
+                        <img src="/images/capa.jpg" alt="Capa do Livro" className="w-full rounded-xl shadow-2xl rotate-2 hover:rotate-0 transition-transform duration-500" />
                     </div>
                 </div>
 

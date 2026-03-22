@@ -148,7 +148,7 @@ export const ChaptersIndex = () => {
                                 </div>
                             </div>
                             <div className="flex flex-col flex-1 p-6 gap-4">
-                                <p className="chapter-desc text-slate-600 dark:text-slate-400 text-sm leading-relaxed line-clamp-3">{chap.description}</p>
+                                <p className="chapter-desc text-slate-600 dark:text-slate-400 text-sm leading-relaxed">{chap.description}</p>
                                 <button className="w-full flex items-center justify-center gap-2 rounded-lg h-11 px-4 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-slate-100 hover:bg-primary hover:text-white transition-all text-sm font-bold mt-auto group">
                                     Explorar
                                     <span className="material-symbols-outlined text-lg translate-x-0 group-hover:translate-x-1 transition-transform">arrow_forward</span>

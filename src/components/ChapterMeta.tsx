@@ -21,7 +21,7 @@ export const ChapterMeta = ({ title, description, chapterNumber, image }: Chapte
         const pageTitle = chapterNumber
             ? `Cap. ${chapterNumber} — ${title} | ${BASE_TITLE}`
             : `${title} | ${BASE_TITLE}`;
-        const ogImage = image ? `${BASE_URL}${image}` : `${BASE_URL}/images/livro-3d.png`;
+        const ogImage = image ? `${BASE_URL}${image}` : `${BASE_URL}/images/capa.jpg`;
 
         // Title
         document.title = pageTitle;
@@ -52,10 +52,10 @@ export const ChapterMeta = ({ title, description, chapterNumber, image }: Chapte
             setMeta('name', 'description', 'A Topografia do Desejo e a Desconstrução do Sujeito Performativo.');
             setMeta('property', 'og:title', BASE_TITLE);
             setMeta('property', 'og:description', 'A Topografia do Desejo e a Desconstrução do Sujeito Performativo. Leia os primeiros capítulos gratuitamente e descubra a Arquitetura da Graça.');
-            setMeta('property', 'og:image', `${BASE_URL}/images/livro-3d.png`);
+            setMeta('property', 'og:image', `${BASE_URL}/images/capa.jpg`);
             setMeta('name', 'twitter:title', BASE_TITLE);
             setMeta('name', 'twitter:description', 'A Topografia do Desejo e a Desconstrução do Sujeito Performativo. Leia os primeiros capítulos gratuitamente e descubra a Arquitetura da Graça.');
-            setMeta('name', 'twitter:image', `${BASE_URL}/images/livro-3d.png`);
+            setMeta('name', 'twitter:image', `${BASE_URL}/images/capa.jpg`);
         };
     }, [title, description, chapterNumber, image]);
 

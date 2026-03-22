@@ -148,7 +148,7 @@ export const Login = () => {
                         <div className="float-animation">
                             <div className="book-wrapper relative w-[260px] sm:w-[320px] xl:w-[380px] shrink-0 rounded-2xl overflow-hidden bg-slate-100 dark:bg-card-dark border border-white/10 flex">
                                 <div className="relative w-full opacity-100 flex flex-col">
-                                    <img src="/images/bg-login.png" alt="O Evangelho Eterno Imagem" className="w-full h-auto object-contain object-center block" />
+                                    <img src="/images/capa.jpg" alt="O Evangelho Eterno Imagem" className="w-full h-auto object-contain object-center block" />
                                     <div className="absolute inset-0 bg-gradient-to-t from-dark-bg/60 via-dark-bg/10 to-transparent"></div>
                                 </div>
                             </div>

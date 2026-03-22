@@ -10,7 +10,7 @@ export const AmazonCTA = () => {
                 <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
                     <div className="w-32 md:w-40 shrink-0">
                         <img
-                            src="/images/livro-3d.png"
+                            src="/images/capa.jpg"
                             alt="Capa do Livro O Evangelho Eterno"
                             className="w-full rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] rotate-[-4deg] group-hover:rotate-0 transition-transform duration-500"
                         />

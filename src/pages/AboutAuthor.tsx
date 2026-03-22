@@ -11,7 +11,7 @@ export const AboutAuthor = () => {
             <ChapterMeta
                 title="Sobre o Autor"
                 description="Conheça Miguel, o Príncipe — autor de O Evangelho Eterno e a Ciência da Graça, sua trajetória intelectual e a visão por trás da obra."
-                image="/images/livro-3d.png"
+                image="/images/capa.jpg"
             />
             <style>{`
                 .profile-mask {
