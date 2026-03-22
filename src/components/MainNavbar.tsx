@@ -27,7 +27,6 @@ export const MainNavbar: React.FC<MainNavbarProps> = ({ onMenuToggle, onNotifica
         const closeMenu = (e: MouseEvent) => {
             if (!(e.target as Element).closest('.user-menu-container') && !(e.target as Element).closest('.notifications-container')) {
                 setUserMenuOpen(false);
-                setNotificationsOpen(false);
             }
         };
         document.addEventListener('click', closeMenu);

@@ -76,6 +76,8 @@ export const TagNetwork: React.FC = () => {
 
     const [selectedTag, setSelectedTag] = useState<string | null>(null);
     const [sections, setSections] = useState<SectionSummary[]>([]);
+    const [relatedSections, setRelatedSections] = useState<SectionSummary[]>([]);
+    const [relatedSectionsLoading, setRelatedSectionsLoading] = useState(false);
     const [sectionsLoading, setSectionsLoading] = useState(false);
 
     const onNodeClickRef = useRef<(tagId: string) => void>(() => {});
@@ -106,6 +108,30 @@ export const TagNetwork: React.FC = () => {
             .then(({ data, error }) => {
                 setSections(!error && data ? (data as SectionSummary[]) : []);
                 setSectionsLoading(false);
+            });
+    }, [selectedTag]);
+
+    // Fetch sections for correlated tags (Assuntos Relacionados)
+    useEffect(() => {
+        if (!selectedTag) { setRelatedSections([]); return; }
+        const corTags = Array.from(
+            STATIC_CHAPTERS
+                .filter(ch => ch.tags.includes(selectedTag))
+                .reduce((acc, ch) => {
+                    ch.tags.forEach(t => { if (t !== selectedTag) acc.add(t); });
+                    return acc;
+                }, new Set<string>())
+        );
+        if (corTags.length === 0) { setRelatedSections([]); return; }
+        setRelatedSectionsLoading(true);
+        supabase
+            .from('chapter_sections')
+            .select('id, chapter_id, order_num, title, subtitle, tag_line, description, read_time, published, tags, created_at, updated_at')
+            .overlaps('tags', corTags)
+            .eq('published', true)
+            .then(({ data, error }) => {
+                setRelatedSections(!error && data ? (data as SectionSummary[]) : []);
+                setRelatedSectionsLoading(false);
             });
     }, [selectedTag]);
 
@@ -277,6 +303,32 @@ export const TagNetwork: React.FC = () => {
     const filteredPosts    = selectedTag ? posts.filter(p => (p.tags ?? []).includes(selectedTag))    : [];
     const chapterOrderMap  = Object.fromEntries(chapters.map(c => [c.id, c.order_num]));
 
+    // Tags that co-occur with the selected tag in the same chapter
+    const correlatedTags: string[] = selectedTag
+        ? Array.from(
+            STATIC_CHAPTERS
+                .filter(ch => ch.tags.includes(selectedTag))
+                .reduce((acc, ch) => {
+                    ch.tags.forEach(t => { if (t !== selectedTag) acc.add(t); });
+                    return acc;
+                }, new Set<string>())
+          )
+        : [];
+
+    // Posts with at least one correlated tag (case-insensitive)
+    const correlatedTagsLower = correlatedTags.map(t => t.toLowerCase());
+    const relatedPosts = selectedTag
+        ? posts.filter(p => (p.tags ?? []).some(t => correlatedTagsLower.includes(t.toLowerCase())))
+        : [];
+
+    // Chapters with any correlated tag
+    const relatedChapters = selectedTag
+        ? chapters.filter(ch => (ch.tags ?? []).some(t => correlatedTagsLower.includes(t.toLowerCase())))
+        : [];
+
+    const totalRelated = relatedChapters.length + relatedPosts.length + relatedSections.length;
+
+
     const containerBg =
         theme === 'dark'  ? 'bg-[#0E1115] border-[#BF8339]/20' :
         theme === 'sepia' ? 'bg-[#F1E1B9] border-[#BF8339]/30' :
@@ -423,6 +475,123 @@ export const TagNetwork: React.FC = () => {
                                             </button>
                                         );
                                     })}
+                        </div>
+                    </div>
+
+                    {/* Assuntos Relacionados */}
+                    <div className="mt-10 pt-8 border-t border-slate-100 dark:border-slate-800">
+                        <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#BF8339] mb-1">
+                            <span className="material-symbols-outlined text-base">hub</span>
+                            Assuntos Relacionados
+                            <span className="ml-auto text-[10px] text-slate-400 normal-case tracking-normal font-normal">
+                                {totalRelated} resultado{totalRelated !== 1 ? 's' : ''}
+                            </span>
+                        </h3>
+                        <p className="text-xs text-slate-400 mb-3 italic">
+                            Conteúdos com tags conectadas a <span className="font-semibold not-italic text-[#BF8339]">#{FULL_NAMES[selectedTag!] ?? selectedTag}</span> no diagrama
+                        </p>
+                        {correlatedTags.length > 0 && (
+                            <div className="flex flex-wrap gap-1.5 mb-6">
+                                {correlatedTags.map(t => (
+                                    <span key={t} className="text-[10px] px-2 py-0.5 rounded-full border border-[#BF8339]/40 text-[#BF8339]">
+                                        #{t}
+                                    </span>
+                                ))}
+                            </div>
+                        )}
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            {/* Capítulos relacionados */}
+                            <div>
+                                <h4 className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-4">
+                                    <span className="material-symbols-outlined text-base">menu_book</span>
+                                    Capítulos
+                                    <span className="ml-auto text-[10px] normal-case tracking-normal font-normal">{relatedChapters.length}</span>
+                                </h4>
+                                {relatedChapters.length === 0
+                                    ? <p className="text-sm text-slate-400 italic">Nenhum capítulo encontrado.</p>
+                                    : relatedChapters.map(ch => (
+                                        <button key={ch.id} onClick={() => navigate(`/capitulo/${ch.order_num}`)}
+                                            className="w-full text-left mb-3 p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-card-dark hover:border-[#BF8339]/50 hover:shadow-md transition-all group">
+                                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#BF8339] mb-1">
+                                                Capítulo {String(ch.order_num).padStart(2, '0')}
+                                            </p>
+                                            <p className="text-sm font-semibold leading-snug group-hover:text-[#BF8339] transition-colors">{ch.title}</p>
+                                            {ch.subtitle && <p className="text-xs text-slate-500 mt-1 line-clamp-2">{ch.subtitle}</p>}
+                                            <div className="flex flex-wrap gap-1 mt-2">
+                                                {(ch.tags ?? []).filter(t => correlatedTagsLower.includes(t.toLowerCase())).slice(0, 3).map(t => (
+                                                    <span key={t} className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#BF8339]/10 text-[#BF8339] border border-[#BF8339]/20">#{t}</span>
+                                                ))}
+                                            </div>
+                                        </button>
+                                    ))
+                                }
+                            </div>
+
+                            {/* Artigos relacionados */}
+                            <div>
+                                <h4 className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-4">
+                                    <span className="material-symbols-outlined text-base">article</span>
+                                    Artigos
+                                    <span className="ml-auto text-[10px] normal-case tracking-normal font-normal">{relatedPosts.length}</span>
+                                </h4>
+                                {relatedPosts.length === 0
+                                    ? <p className="text-sm text-slate-400 italic">Nenhum artigo encontrado.</p>
+                                    : relatedPosts.map(p => {
+                                        const matchingTags = (p.tags ?? []).filter(t => correlatedTagsLower.includes(t.toLowerCase()));
+                                        return (
+                                            <button key={p.id} onClick={() => navigate(`/post/${p.slug}`)}
+                                                className="w-full text-left mb-3 p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-card-dark hover:border-[#BF8339]/50 hover:shadow-md transition-all group">
+                                                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">{p.date}</p>
+                                                <p className="text-sm font-semibold leading-snug mb-2 group-hover:text-[#BF8339] transition-colors">{p.title}</p>
+                                                {p.description && <p className="text-xs text-slate-500 mb-2 line-clamp-2">{p.description}</p>}
+                                                <div className="flex flex-wrap gap-1">
+                                                    {matchingTags.slice(0, 3).map(t => (
+                                                        <span key={t} className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#BF8339]/10 text-[#BF8339] border border-[#BF8339]/20">#{t}</span>
+                                                    ))}
+                                                </div>
+                                            </button>
+                                        );
+                                    })
+                                }
+                            </div>
+
+                            {/* Subseções relacionadas */}
+                            <div>
+                                <h4 className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-4">
+                                    <span className="material-symbols-outlined text-base">bookmark</span>
+                                    Subseções
+                                    {!relatedSectionsLoading && (
+                                        <span className="ml-auto text-[10px] normal-case tracking-normal font-normal">{relatedSections.length}</span>
+                                    )}
+                                </h4>
+                                {relatedSectionsLoading
+                                    ? <span className="material-symbols-outlined animate-spin text-[#BF8339] text-2xl">sync</span>
+                                    : relatedSections.length === 0
+                                        ? <p className="text-sm text-slate-400 italic">Nenhuma subseção encontrada.</p>
+                                        : relatedSections.map(s => {
+                                            const chapNum = chapterOrderMap[s.chapter_id];
+                                            return (
+                                                <button key={s.id}
+                                                    onClick={() => chapNum != null && navigate(`/capitulo/${chapNum}/secao/${s.id}`)}
+                                                    className="w-full text-left mb-3 p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-card-dark hover:border-[#BF8339]/50 hover:shadow-md transition-all group">
+                                                    {chapNum != null && (
+                                                        <p className="text-[10px] font-bold uppercase tracking-widest text-[#BF8339] mb-1">
+                                                            Cap. {String(chapNum).padStart(2, '0')}
+                                                        </p>
+                                                    )}
+                                                    <p className="text-sm font-semibold leading-snug group-hover:text-[#BF8339] transition-colors">{s.title}</p>
+                                                    {s.subtitle && <p className="text-xs text-slate-500 mt-1 line-clamp-2">{s.subtitle}</p>}
+                                                    <div className="flex flex-wrap gap-1 mt-2">
+                                                        {(s.tags ?? []).filter(t => correlatedTagsLower.includes(t.toLowerCase())).slice(0, 3).map(t => (
+                                                            <span key={t} className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#BF8339]/10 text-[#BF8339] border border-[#BF8339]/20">#{t}</span>
+                                                        ))}
+                                                    </div>
+                                                </button>
+                                            );
+                                        })
+                                }
+                            </div>
                         </div>
                     </div>
                 </div>
