@@ -23,6 +23,7 @@ import { Post } from './pages/Post';
 import { Search } from './pages/Search';
 import { Admin } from './pages/Admin';
 import { DynamicSection } from './pages/DynamicSection';
+import { TagNetwork } from './pages/TagNetwork';
 
 const ProtectedRoute = ({ children, adminOnly = false }: { children: React.ReactNode; adminOnly?: boolean }) => {
   const { session, loading, user } = useAuth();
@@ -68,6 +69,7 @@ function App() {
                   <Route path="/capitulos" element={<ChaptersIndex />} />
                   <Route path="/buscar" element={<Search />} />
                   <Route path="/artigos" element={<PostsIndex />} />
+                  <Route path="/rede-de-tags" element={<TagNetwork />} />
                   <Route path="/sobre-a-obra" element={<AboutBook />} />
                   <Route path="/sobre-o-autor" element={<AboutAuthor />} />
                   <Route path="/post/:slug" element={<Post />} />

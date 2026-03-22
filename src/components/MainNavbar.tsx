@@ -53,6 +53,7 @@ export const MainNavbar: React.FC<MainNavbarProps> = ({ onMenuToggle, onNotifica
                     <Link className={`text-sm font-medium hover:text-primary transition-colors ${location.pathname === '/sobre-a-obra' ? 'text-primary' : ''}`} to="/sobre-a-obra">Sobre a Obra</Link>
                     <Link className={`text-sm font-medium hover:text-primary transition-colors ${location.pathname === '/sobre-o-autor' ? 'text-primary' : ''}`} to="/sobre-o-autor">Sobre o Autor</Link>
                     <Link className={`text-sm font-medium hover:text-primary transition-colors ${location.pathname === '/artigos' ? 'text-primary' : ''}`} to="/artigos">Artigos</Link>
+                    <Link className={`text-sm font-medium hover:text-primary transition-colors ${location.pathname === '/rede-de-tags' ? 'text-primary' : ''}`} to="/rede-de-tags">Rede de Tags</Link>
                 </nav>
 
                 <Link to="/buscar" className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors" title="Buscar">
