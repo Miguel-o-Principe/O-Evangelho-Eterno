@@ -6,12 +6,14 @@ import { supabase } from '../lib/supabase';
 export const Login = () => {
     const { theme, toggleTheme } = useTheme();
     const [isRegistering, setIsRegistering] = useState(false);
+    const [showPasswordReset, setShowPasswordReset] = useState(false);
     const [loading, setLoading] = useState(false);
 
     // Form States
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [fullName, setFullName] = useState('');
+    const [resetEmail, setResetEmail] = useState('');
     const [errorMsg, setErrorMsg] = useState('');
     const [successMsg, setSuccessMsg] = useState('');
     const [showPassword, setShowPassword] = useState(false);
@@ -91,6 +93,30 @@ export const Login = () => {
         }
     };
 
+    const handlePasswordReset = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        setErrorMsg('');
+        setSuccessMsg('');
+
+        const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+            redirectTo: `${window.location.origin}/reset-password`,
+        });
+
+        if (error) {
+            setErrorMsg('Não foi possível enviar o email de reset. Verifique se o e-mail está correto.');
+            setLoading(false);
+        } else {
+            setSuccessMsg('Email de recuperação enviado! Verifique sua caixa de entrada.');
+            setResetEmail('');
+            setTimeout(() => {
+                setShowPasswordReset(false);
+                setSuccessMsg('');
+            }, 3000);
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen antialiased transition-colors duration-300 flex flex-col overflow-x-hidden">
             <nav className="w-full p-6 flex justify-between items-center z-20">
@@ -166,7 +192,7 @@ export const Login = () => {
                                                 <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="rounded text-primary focus:ring-primary bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-600 transition-colors" />
                                                 <span className="text-slate-500 font-medium group-hover:text-primary transition-colors">Lembrar acesso</span>
                                             </label>
-                                            <button type="button" className="text-primary font-bold hover:underline">Esqueceu a senha?</button>
+                                            <button type="button" onClick={() => setShowPasswordReset(true)} className="text-primary font-bold hover:underline">Esqueceu a senha?</button>
                                         </div>
 
                                         <div className="pt-4 flex flex-col gap-4">
@@ -245,6 +271,63 @@ export const Login = () => {
                     </div>
                 </div>
             </main >
+
+            {/* Password Reset Modal */}
+            {showPasswordReset && (
+                <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-6">
+                    <div className="bg-white dark:bg-card-dark rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-800 w-full max-w-md p-8 relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-1.5 bg-primary opacity-60"></div>
+                        
+                        <button 
+                            onClick={() => { setShowPasswordReset(false); setErrorMsg(''); setSuccessMsg(''); }} 
+                            className="absolute top-4 right-4 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
+                        >
+                            <span className="material-symbols-outlined">close</span>
+                        </button>
+
+                        <h2 className="text-2xl font-bold mb-2 text-primary">Recuperar Senha</h2>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">Informe seu e-mail para receber um link de redefinição de senha.</p>
+
+                        <form onSubmit={handlePasswordReset} className="space-y-4">
+                            {errorMsg && <div className="p-3 text-xs font-bold text-red-600 bg-red-100 rounded-lg">{errorMsg}</div>}
+                            {successMsg && <div className="p-3 text-xs font-bold text-green-600 bg-green-100 rounded-lg">{successMsg}</div>}
+
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">E-mail cadastrado</label>
+                                <div className="relative">
+                                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl">mail</span>
+                                    <input 
+                                        type="email" 
+                                        value={resetEmail} 
+                                        onChange={e => setResetEmail(e.target.value)} 
+                                        required 
+                                        className="w-full bg-slate-50 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800 rounded-xl py-3.5 pl-11 focus:ring-2 focus:ring-primary/40 transition-all outline-none text-sm" 
+                                        placeholder="seu@email.com"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="pt-2 flex flex-col gap-3">
+                                <button 
+                                    type="submit" 
+                                    disabled={loading} 
+                                    className="flex justify-center items-center w-full h-11 bg-primary text-white font-bold rounded-xl hover:brightness-110 shadow-lg shadow-primary/20 transition-all text-sm tracking-wide disabled:opacity-70"
+                                >
+                                    {loading ? <span className="material-symbols-outlined animate-spin text-lg">sync</span> : 'Enviar Link de Reset'}
+                                </button>
+
+                                <button 
+                                    type="button" 
+                                    onClick={() => { setShowPasswordReset(false); setErrorMsg(''); setSuccessMsg(''); }} 
+                                    className="w-full h-11 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-bold rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900/40 transition-all text-sm"
+                                >
+                                    Cancelar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
 
             <footer className="p-10 text-center opacity-40 mt-auto">
                 <p className="text-[10px] font-medium uppercase tracking-[0.4em]">O Evangelho Eterno e A Arquitetura da Graça • 2026</p>

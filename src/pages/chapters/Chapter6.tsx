@@ -8,8 +8,8 @@ export const Chapter6 = () => {
     return (
         <>
             <ChapterMeta
-                title="Capítulo 06 — Em Breve"
-                description="Conteúdo em preparação. Em breve disponível."
+                title="Capítulo 06 — O Evangelho Eterno"
+                description="O convite final para abandonar toda ansiedade e entrar no descanso definitivo do Sábado Eterno."
                 chapterNumber="06"
                 image="/images/capitulo-4-bg.png"
             />
@@ -23,12 +23,13 @@ export const Chapter6 = () => {
                     <div className="max-w-5xl mx-auto">
                         <div className="flex flex-col items-center text-center">
                             <div className="w-12 h-[2px] bg-primary mb-8 text-white"></div>
-                            <span className="text-primary font-bold tracking-[0.5em] uppercase text-[10px] mb-6 block">Em Breve</span>
+                            <span className="text-primary font-bold tracking-[0.5em] uppercase text-[10px] mb-6 block">A Libertação Final</span>
                             <h1 className="text-4xl md:text-6xl font-serif font-bold text-white mb-8 italic leading-tight max-w-5xl">
-                                Capítulo 06
+                                O Evangelho Eterno
                             </h1>
                             <div className="flex items-center gap-8 text-white/50 text-[10px] font-bold uppercase tracking-widest">
-                                <span className="flex items-center gap-2"><span className="material-symbols-outlined text-sm text-primary">menu_book</span> Cap. 06</span>
+                                <span className="flex items-center gap-2"><span className="material-symbols-outlined text-sm text-primary">checkmark</span> Cap. 06</span>
+                                <span className="flex items-center gap-2"><span className="material-symbols-outlined text-sm text-primary">hourglass_empty</span> 40 min de leitura</span>
                             </div>
                         </div>
                     </div>

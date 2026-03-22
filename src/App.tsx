@@ -12,12 +12,15 @@ import { ReaderLayout } from './layouts/ReaderLayout';
 // Pages
 import { Landing } from './pages/Landing';
 import { Login } from './pages/Login';
+import { ResetPassword } from './pages/ResetPassword';
 import { ChaptersIndex } from './pages/ChaptersIndex';
 import { Chapter } from './pages/Chapter';
 import { Settings } from './pages/Settings';
 import { AboutBook } from './pages/AboutBook';
 import { AboutAuthor } from './pages/AboutAuthor';
+import { PostsIndex } from './pages/PostsIndex';
 import { Post } from './pages/Post';
+import { Search } from './pages/Search';
 import { Admin } from './pages/Admin';
 import { DynamicSection } from './pages/DynamicSection';
 
@@ -57,9 +60,14 @@ function App() {
                 {/* Rota de Login */}
                 <Route path="/login" element={<Login />} />
 
+                {/* Rota de Reset de Senha */}
+                <Route path="/reset-password" element={<ResetPassword />} />
+
                 {/* Rotas principais do Portal (usando MainLayout público) */}
                 <Route element={<MainLayout />}>
                   <Route path="/capitulos" element={<ChaptersIndex />} />
+                  <Route path="/buscar" element={<Search />} />
+                  <Route path="/artigos" element={<PostsIndex />} />
                   <Route path="/sobre-a-obra" element={<AboutBook />} />
                   <Route path="/sobre-o-autor" element={<AboutAuthor />} />
                   <Route path="/post/:slug" element={<Post />} />

@@ -37,9 +37,9 @@ export const chapters = [
     {
         id: "6",
         n: "06",
-        title: "Capítulo 06",
+        title: "O Evangelho Eterno",
         img: "/images/capitulo-4-bg.png",
-        desc: `Conteúdo em preparação. Em breve disponível.`
+        desc: `O convite final para abandonar toda ansiedade e entrar no descanso definitivo do Sábado Eterno.`
     },
     {
         id: "7",
