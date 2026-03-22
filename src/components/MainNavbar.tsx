@@ -51,8 +51,8 @@ export const MainNavbar: React.FC<MainNavbarProps> = ({ onMenuToggle, onNotifica
             <div className="flex flex-1 justify-end gap-4 items-center">
                 <nav className="hidden md:flex items-center gap-8 mr-4">
                     <Link className={`text-sm font-medium hover:text-primary transition-colors ${location.pathname === '/sobre-a-obra' ? 'text-primary' : ''}`} to="/sobre-a-obra">Sobre a Obra</Link>
-                    <Link className={`text-sm font-medium hover:text-primary transition-colors ${location.pathname === '/artigos' ? 'text-primary' : ''}`} to="/artigos">Artigos</Link>
                     <Link className={`text-sm font-medium hover:text-primary transition-colors ${location.pathname === '/sobre-o-autor' ? 'text-primary' : ''}`} to="/sobre-o-autor">Sobre o Autor</Link>
+                    <Link className={`text-sm font-medium hover:text-primary transition-colors ${location.pathname === '/artigos' ? 'text-primary' : ''}`} to="/artigos">Artigos</Link>
                 </nav>
 
                 <Link to="/buscar" className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors" title="Buscar">
