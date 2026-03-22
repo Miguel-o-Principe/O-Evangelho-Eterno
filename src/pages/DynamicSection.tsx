@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useSection } from '../hooks/useChapterSections';
 import { AmazonCTA } from '../components/AmazonCTA';
+import { ChapterMeta } from '../components/ChapterMeta';
 
 const markdownComponents: any = {
     h3: ({ children, ...props }: any) => (
@@ -84,6 +85,12 @@ export const DynamicSection = () => {
 
     return (
         <>
+            <ChapterMeta
+                title={section.title}
+                description={section.description || section.subtitle || section.title}
+                chapterNumber={`${chapNumStr} · Seção ${sectionNumStr}`}
+                image={chapterImageUrl}
+            />
             {/* Breadcrumb / back link */}
             <div className="bg-background-light dark:bg-dark-bg border-b border-slate-200 dark:border-white/5 px-6 py-3">
                 <div className="max-w-3xl mx-auto">

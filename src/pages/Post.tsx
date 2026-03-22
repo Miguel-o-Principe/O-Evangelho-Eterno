@@ -4,6 +4,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { CommentSection } from '../components/CommentSection';
 import { supabase } from '../lib/supabase';
 import { PostMeta } from '../hooks/usePosts';
+import { ChapterMeta } from '../components/ChapterMeta';
 
 export const Post = () => {
     const { slug } = useParams<{ slug: string }>();
@@ -111,6 +112,11 @@ export const Post = () => {
 
     return (
         <React.Fragment>
+            <ChapterMeta
+                title={post.title}
+                description={post.description || post.title}
+                image={post.coverImage}
+            />
             {/* Header Visual */}
             <header className="relative h-[60vh] md:h-[70vh] w-full overflow-hidden flex items-end">
                 <div className="absolute inset-0 scale-105">

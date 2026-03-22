@@ -1,9 +1,15 @@
 import React from 'react';
 import { AmazonCTA } from '../components/AmazonCTA';
+import { ChapterMeta } from '../components/ChapterMeta';
 
 export const AboutBook = () => {
     return (
         <main className="w-full max-w-4xl mx-auto px-4 sm:px-6 py-12 lg:py-24 fade-up overflow-hidden">
+            <ChapterMeta
+                title="Sobre a Obra"
+                description="Uma análise interdisciplinar de O Evangelho Eterno e a Ciência da Graça — Psicanálise Lacaniana, Teologia Bíblica, Cosmologia Quântica e Filosofia Existencialista."
+                image="/images/livro-3d.png"
+            />
             <style>{`
                 .text-gradient {
                     background: linear-gradient(to right, #ec1337, #ff4d6d);

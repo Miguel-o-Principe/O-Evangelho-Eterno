@@ -2,11 +2,17 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { CommentSection } from '../components/CommentSection';
+import { ChapterMeta } from '../components/ChapterMeta';
 
 export const AboutAuthor = () => {
     const { session } = useAuth();
     return (
         <main className="max-w-6xl mx-auto px-6 py-12 lg:py-24 fade-up flex-1 w-full text-slate-800 dark:text-slate-200">
+            <ChapterMeta
+                title="Sobre o Autor"
+                description="Conheça Miguel, o Príncipe — autor de O Evangelho Eterno e a Ciência da Graça, sua trajetória intelectual e a visão por trás da obra."
+                image="/images/livro-3d.png"
+            />
             <style>{`
                 .profile-mask {
                     mask-image: linear-gradient(to bottom, black 80%, transparent 100%);

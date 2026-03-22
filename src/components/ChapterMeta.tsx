@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 interface ChapterMetaProps {
     title: string;
     description: string;
-    chapterNumber: string;
+    chapterNumber?: string;  // undefined = não usa prefixo "Cap. X —"
     image?: string;
 }
 
@@ -11,12 +11,16 @@ const BASE_TITLE = 'O Evangelho Eterno e a Ciência da Graça';
 const BASE_URL = 'https://oevangelhoeterno.vercel.app';
 
 /**
- * Dynamically sets document.title and <meta> tags for SEO per chapter.
+ * Dynamically sets document.title and <meta> tags for SEO.
+ * If chapterNumber is provided, formats as "Cap. X — Title | BASE_TITLE".
+ * Otherwise formats as "Title | BASE_TITLE".
  * Cleans up on unmount (restores defaults).
  */
 export const ChapterMeta = ({ title, description, chapterNumber, image }: ChapterMetaProps) => {
     useEffect(() => {
-        const pageTitle = `Cap. ${chapterNumber} — ${title} | ${BASE_TITLE}`;
+        const pageTitle = chapterNumber
+            ? `Cap. ${chapterNumber} — ${title} | ${BASE_TITLE}`
+            : `${title} | ${BASE_TITLE}`;
         const ogImage = image ? `${BASE_URL}${image}` : `${BASE_URL}/images/livro-3d.png`;
 
         // Title
