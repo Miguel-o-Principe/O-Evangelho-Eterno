@@ -78,6 +78,7 @@ export const Admin = () => {
     const { posts, loading: postsLoading } = usePosts(true);
 
     const [expandedChapter, setExpandedChapter] = useState<string | null>(null);
+    const [activeTab, setActiveTab] = useState<'chapters' | 'posts'>('chapters');
     const [editMode, setEditMode] = useState<EditMode>(null);
     const [editingChapterId, setEditingChapterId] = useState<string | null>(null);
     const [editingSectionId, setEditingSectionId] = useState<string | null>(null);
@@ -88,12 +89,14 @@ export const Admin = () => {
     const [saving, setSaving] = useState(false);
     const [saveMsg, setSaveMsg] = useState('');
     const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; type: 'chapter' | 'section' | 'post' } | null>(null);
+    const [inlineEdit, setInlineEdit] = useState<{ id: string; field: string; value: string } | null>(null);
 
     const isAdmin = user?.user_metadata?.is_admin === true;
     useEffect(() => { if (!isAdmin) navigate('/'); }, [isAdmin, navigate]);
 
     // ── Edit chapter ──
     const startEditChapter = async (chap: ChapterSummary) => {
+        setActiveTab('chapters');
         setEditMode('chapter');
         setEditingChapterId(chap.id);
         setEditingSectionId(null);
@@ -102,6 +105,7 @@ export const Admin = () => {
     };
 
     const startCreateChapter = () => {
+        setActiveTab('chapters');
         setEditMode('chapter');
         setEditingChapterId(null);
         setEditingSectionId(null);
@@ -126,6 +130,7 @@ export const Admin = () => {
 
     // ── Edit section ──
     const startEditSection = async (sec: SectionSummary) => {
+        setActiveTab('chapters');
         setEditMode('section');
         setEditingSectionId(sec.id);
         setEditingChapterId(null);
@@ -134,6 +139,7 @@ export const Admin = () => {
     };
 
     const startCreateSection = (chap: ChapterSummary) => {
+        setActiveTab('chapters');
         setEditMode('section');
         setEditingSectionId(null);
         setEditingChapterId(null);
@@ -162,6 +168,7 @@ export const Admin = () => {
 
     // ── Edit post ──
     const startEditPost = async (post: PostMeta) => {
+        setActiveTab('posts');
         setEditMode('post');
         setEditingPostId(post.id);
         setEditingChapterId(null);
@@ -183,6 +190,7 @@ export const Admin = () => {
     };
 
     const startCreatePost = () => {
+        setActiveTab('posts');
         setEditMode('post');
         setEditingPostId(null);
         setEditingChapterId(null);
@@ -227,6 +235,13 @@ export const Admin = () => {
         if (!saving) setTimeout(() => window.location.reload(), 1200);
     };
 
+    const saveInlineEdit = async (id: string, table: 'chapters' | 'chapter_sections' | 'posts', field: string, value: string) => {
+        const parsed: any = field === 'read_time' ? (parseInt(value) || 0) : value;
+        await supabase.from(table).update({ [field]: parsed }).eq('id', id);
+        setInlineEdit(null);
+        window.location.reload();
+    };
+
     const togglePublished = async (id: string, table: 'chapters' | 'chapter_sections' | 'posts', current: boolean) => {
         await supabase.from(table).update({ published: !current }).eq('id', id);
         window.location.reload();
@@ -241,7 +256,7 @@ export const Admin = () => {
     };
 
     const showForm = editMode !== null;
-    const currentTab = editMode === 'post' ? 'posts' : editMode ? 'chapters' : 'chapters';
+    const currentTab = activeTab;
 
     const normalizeSlug = (value: string) => {
         return value.toLowerCase().replace(/[^a-z0-9-]/g, '-');
@@ -253,15 +268,15 @@ export const Admin = () => {
             <div className="border-b border-slate-200 dark:border-white/5 sticky top-16 z-30 bg-background-light dark:bg-dark-bg">
                 <div className="max-w-7xl mx-auto px-6 flex gap-8">
                     <button
-                        onClick={() => { setEditMode(null); setEditingChapterId(null); setEditingSectionId(null); setEditingPostId(null); }}
-                        className={`py-4 px-2 font-bold text-sm uppercase tracking-widest border-b-2 transition-all ${editMode !== 'post' ? 'border-primary text-primary' : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                        onClick={() => { setActiveTab('chapters'); setEditMode(null); setEditingChapterId(null); setEditingSectionId(null); setEditingPostId(null); }}
+                        className={`py-4 px-2 font-bold text-sm uppercase tracking-widest border-b-2 transition-all ${activeTab === 'chapters' ? 'border-primary text-primary' : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
                     >
                         <span className="material-symbols-outlined inline mr-2 text-base align-middle">menu_book</span>
                         Capítulos & Seções ({chapters.length})
                     </button>
                     <button
-                        onClick={() => { setEditMode('post'); setEditingChapterId(null); setEditingSectionId(null); setEditingPostId(null); }}
-                        className={`py-4 px-2 font-bold text-sm uppercase tracking-widest border-b-2 transition-all ${editMode === 'post' ? 'border-primary text-primary' : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                        onClick={() => { setActiveTab('posts'); setEditMode(null); setEditingChapterId(null); setEditingSectionId(null); setEditingPostId(null); }}
+                        className={`py-4 px-2 font-bold text-sm uppercase tracking-widest border-b-2 transition-all ${activeTab === 'posts' ? 'border-primary text-primary' : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
                     >
                         <span className="material-symbols-outlined inline mr-2 text-base align-middle">article</span>
                         Artigos ({posts.length})
@@ -271,7 +286,7 @@ export const Admin = () => {
 
             <div className="max-w-7xl mx-auto px-6 py-8">
                 <div className={`grid ${showForm ? 'grid-cols-1 xl:grid-cols-2' : 'grid-cols-1'} gap-8`}>
-                    {editMode !== 'post' && (
+                    {activeTab === 'chapters' && (
                     <div className="space-y-2">
                         <div className="mb-8 pb-8 border-b-2 border-slate-100 dark:border-slate-800">
                             <h2 className="text-sm font-bold uppercase tracking-widest text-slate-500 mb-2 flex items-center gap-2">
@@ -305,6 +320,17 @@ export const Admin = () => {
                                                 </span>
                                                 {sections.length > 0 && (
                                                     <span className="text-[9px] font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 dark:text-slate-500 px-1.5 py-0.5 rounded-full">{sections.length} seç.</span>
+                                                )}
+                                                {inlineEdit?.id === chap.id && inlineEdit.field === 'read_time' ? (
+                                                    <input type="number" autoFocus
+                                                        className="w-16 px-1.5 py-0.5 text-[10px] rounded-full border border-primary outline-none bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200"
+                                                        value={inlineEdit.value}
+                                                        onChange={e => setInlineEdit({ ...inlineEdit, value: e.target.value })}
+                                                        onBlur={() => saveInlineEdit(chap.id, 'chapters', 'read_time', inlineEdit.value)}
+                                                        onKeyDown={e => { if (e.key === 'Enter') saveInlineEdit(chap.id, 'chapters', 'read_time', inlineEdit.value); if (e.key === 'Escape') setInlineEdit(null); }}
+                                                    />
+                                                ) : (
+                                                    <span onClick={() => setInlineEdit({ id: chap.id, field: 'read_time', value: String(chap.read_time) })} title="Clique para editar tempo de leitura" className="text-[9px] text-slate-400 bg-slate-100 dark:bg-slate-800 dark:text-slate-500 px-1.5 py-0.5 rounded-full cursor-pointer hover:bg-primary/10 hover:text-primary transition-colors">⏱ {chap.read_time} min</span>
                                                 )}
                                             </div>
                                             <p className="font-bold text-sm truncate mt-0.5">{chap.title}</p>
@@ -364,6 +390,17 @@ export const Admin = () => {
                                                                 <span className={`text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full ${sec.published ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400'}`}>
                                                                     {sec.published ? 'Publicado' : 'Rascunho'}
                                                                 </span>
+                                                                {inlineEdit?.id === sec.id && inlineEdit.field === 'read_time' ? (
+                                                                    <input type="number" autoFocus
+                                                                        className="w-14 px-1 py-0.5 text-[9px] rounded-full border border-primary outline-none bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200"
+                                                                        value={inlineEdit.value}
+                                                                        onChange={e => setInlineEdit({ ...inlineEdit, value: e.target.value })}
+                                                                        onBlur={() => saveInlineEdit(sec.id, 'chapter_sections', 'read_time', inlineEdit.value)}
+                                                                        onKeyDown={e => { if (e.key === 'Enter') saveInlineEdit(sec.id, 'chapter_sections', 'read_time', inlineEdit.value); if (e.key === 'Escape') setInlineEdit(null); }}
+                                                                    />
+                                                                ) : (
+                                                                    <span onClick={() => setInlineEdit({ id: sec.id, field: 'read_time', value: String(sec.read_time) })} title="Clique para editar tempo de leitura" className="text-[8px] text-slate-400 bg-slate-100 dark:bg-slate-800 dark:text-slate-500 px-1.5 py-0.5 rounded-full cursor-pointer hover:bg-primary/10 hover:text-primary transition-colors">⏱ {sec.read_time} min</span>
+                                                                )}
                                                             </div>
                                                             <p className="font-semibold text-xs truncate mt-0.5">{sec.title}</p>
                                                         </div>
@@ -406,7 +443,7 @@ export const Admin = () => {
                     )}
 
 
-                    {editMode === 'post' && (
+                    {activeTab === 'posts' && (
                     <div className="space-y-2">
                         <div className="mb-8">
                             <h2 className="text-sm font-bold uppercase tracking-widest text-slate-500 mb-2 flex items-center gap-2">
@@ -449,8 +486,30 @@ export const Admin = () => {
                                             <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded-full ${post.published ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'}`}>
                                                 {post.published ? '✓ Publicado' : '⊘ Rascunho'}
                                             </span>
-                                            <span className="text-[9px] text-slate-400 bg-slate-100 dark:bg-slate-800 dark:text-slate-500 px-2 py-1 rounded">⏱ {post.readTime} min</span>
-                                            {post.date && <span className="text-[9px] text-slate-400">📅 {new Date(post.date).toLocaleDateString('pt-BR')}</span>}
+                                                {inlineEdit?.id === post.id && inlineEdit.field === 'read_time' ? (
+                                                <input type="number" autoFocus
+                                                    className="w-16 px-1.5 py-0.5 text-[10px] rounded border border-primary outline-none bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200"
+                                                    value={inlineEdit.value}
+                                                    onChange={e => setInlineEdit({ ...inlineEdit, value: e.target.value })}
+                                                    onBlur={() => saveInlineEdit(post.id, 'posts', 'read_time', inlineEdit.value)}
+                                                    onKeyDown={e => { if (e.key === 'Enter') saveInlineEdit(post.id, 'posts', 'read_time', inlineEdit.value); if (e.key === 'Escape') setInlineEdit(null); }}
+                                                />
+                                            ) : (
+                                                <span onClick={() => setInlineEdit({ id: post.id, field: 'read_time', value: String(post.readTime) })} title="Clique para editar tempo de leitura" className="text-[9px] text-slate-400 bg-slate-100 dark:bg-slate-800 dark:text-slate-500 px-2 py-1 rounded cursor-pointer hover:bg-primary/10 hover:text-primary transition-colors">⏱ {post.readTime} min</span>
+                                            )}
+                                            {post.date && (
+                                                inlineEdit?.id === post.id && inlineEdit.field === 'date' ? (
+                                                    <input type="date" autoFocus
+                                                        className="px-1.5 py-0.5 text-[10px] rounded border border-primary outline-none bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200"
+                                                        value={inlineEdit.value}
+                                                        onChange={e => setInlineEdit({ ...inlineEdit, value: e.target.value })}
+                                                        onBlur={() => saveInlineEdit(post.id, 'posts', 'date', inlineEdit.value)}
+                                                        onKeyDown={e => { if (e.key === 'Enter') saveInlineEdit(post.id, 'posts', 'date', inlineEdit.value); if (e.key === 'Escape') setInlineEdit(null); }}
+                                                    />
+                                                ) : (
+                                                    <span onClick={() => setInlineEdit({ id: post.id, field: 'date', value: post.date })} title="Clique para editar data" className="text-[9px] text-slate-400 cursor-pointer hover:text-primary transition-colors">📅 {new Date(post.date).toLocaleDateString('pt-BR')}</span>
+                                                )
+                                            )}
                                         </div>
                                         <p className="font-bold text-sm truncate mb-0.5">{post.title}</p>
                                         <p className="text-xs text-slate-500 dark:text-slate-400 truncate">por <span className="font-medium">{post.author}</span></p>
