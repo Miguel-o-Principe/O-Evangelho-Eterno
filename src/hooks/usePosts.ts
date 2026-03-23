@@ -25,7 +25,7 @@ export function usePosts(includeUnpublished: boolean = false) {
                 let query = supabase
                     .from('posts')
                     .select('*')
-                    .order('date', { ascending: false });
+                    .order('title', { ascending: true });
 
                 if (!includeUnpublished) {
                     query = query.eq('published', true);
