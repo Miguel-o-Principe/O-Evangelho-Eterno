@@ -315,18 +315,24 @@ export const TagNetwork: React.FC = () => {
           )
         : [];
 
-    // Posts with at least one correlated tag (case-insensitive)
+    // Posts with at least one correlated tag (case-insensitive), excluding already shown posts
+    const filteredPostIds = new Set(filteredPosts.map(p => p.id));
     const correlatedTagsLower = correlatedTags.map(t => t.toLowerCase());
     const relatedPosts = selectedTag
-        ? posts.filter(p => (p.tags ?? []).some(t => correlatedTagsLower.includes(t.toLowerCase())))
+        ? posts.filter(p => !filteredPostIds.has(p.id) && (p.tags ?? []).some(t => correlatedTagsLower.includes(t.toLowerCase())))
         : [];
 
-    // Chapters with any correlated tag
+    // Chapters with any correlated tag, excluding already shown chapters
+    const filteredChapterIds = new Set(filteredChapters.map(c => c.id));
     const relatedChapters = selectedTag
-        ? chapters.filter(ch => (ch.tags ?? []).some(t => correlatedTagsLower.includes(t.toLowerCase())))
+        ? chapters.filter(ch => !filteredChapterIds.has(ch.id) && (ch.tags ?? []).some(t => correlatedTagsLower.includes(t.toLowerCase())))
         : [];
 
-    const totalRelated = relatedChapters.length + relatedPosts.length + relatedSections.length;
+    // Related sections excluding those already shown in primary sections
+    const filteredSectionIds = new Set(sections.map(s => s.id));
+    const filteredRelatedSections = relatedSections.filter(s => !filteredSectionIds.has(s.id));
+
+    const totalRelated = relatedChapters.length + relatedPosts.length + filteredRelatedSections.length;
 
 
     const containerBg =
@@ -562,14 +568,14 @@ export const TagNetwork: React.FC = () => {
                                     <span className="material-symbols-outlined text-base">bookmark</span>
                                     Subseções
                                     {!relatedSectionsLoading && (
-                                        <span className="ml-auto text-[10px] normal-case tracking-normal font-normal">{relatedSections.length}</span>
+                                        <span className="ml-auto text-[10px] normal-case tracking-normal font-normal">{filteredRelatedSections.length}</span>
                                     )}
                                 </h4>
                                 {relatedSectionsLoading
                                     ? <span className="material-symbols-outlined animate-spin text-[#BF8339] text-2xl">sync</span>
-                                    : relatedSections.length === 0
+                                    : filteredRelatedSections.length === 0
                                         ? <p className="text-sm text-slate-400 italic">Nenhuma subseção encontrada.</p>
-                                        : relatedSections.map(s => {
+                                        : filteredRelatedSections.map(s => {
                                             const chapNum = chapterOrderMap[s.chapter_id];
                                             return (
                                                 <button key={s.id}
