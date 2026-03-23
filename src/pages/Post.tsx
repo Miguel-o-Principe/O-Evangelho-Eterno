@@ -5,6 +5,55 @@ import { CommentSection } from '../components/CommentSection';
 import { supabase } from '../lib/supabase';
 import { PostMeta } from '../hooks/usePosts';
 import { ChapterMeta } from '../components/ChapterMeta';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { AmazonCTA } from '../components/AmazonCTA';
+
+const markdownComponents: any = {
+    h3: ({ children, ...props }: any) => (
+        <h3 className="text-2xl font-serif font-bold text-slate-900 dark:text-white mt-16 mb-8 italic" {...props}>{children}</h3>
+    ),
+    h4: ({ children, ...props }: any) => (
+        <h4 className="text-xl font-serif font-bold text-slate-800 dark:text-slate-200 mt-12 mb-6 italic" {...props}>{children}</h4>
+    ),
+    p: ({ children, ...props }: any) => (
+        <p className="mt-6 mb-8 text-lg font-light leading-relaxed text-slate-800 dark:text-slate-300 antialiased" {...props}>{children}</p>
+    ),
+    strong: ({ children, ...props }: any) => (
+        <strong className="font-bold text-slate-900 dark:text-white" {...props}>{children}</strong>
+    ),
+    em: ({ children, ...props }: any) => (
+        <em className="italic text-slate-700 dark:text-slate-300" {...props}>{children}</em>
+    ),
+    a: ({ children, ...props }: any) => (
+        <a className="text-primary hover:text-primary-dark underline underline-offset-4 decoration-primary/30 hover:decoration-primary transition-colors" {...props}>{children}</a>
+    ),
+    blockquote: ({ children }: any) => (
+        <blockquote className="relative my-16 py-8 px-12 border-l-2 border-primary/30 italic text-2xl text-slate-900 dark:text-white font-light leading-relaxed shadow-sm bg-slate-50/50 dark:bg-slate-900/50 rounded-r-3xl">
+            <span className="absolute top-0 left-4 text-6xl text-primary/10 font-serif">&#34;</span>
+            {children}
+        </blockquote>
+    ),
+    ul: ({ children, ...props }: any) => (
+        <ul className="list-disc list-inside my-6 space-y-2 text-slate-800 dark:text-slate-300 ml-4" {...props}>{children}</ul>
+    ),
+    ol: ({ children, ...props }: any) => (
+        <ol className="list-decimal list-inside my-6 space-y-2 text-slate-800 dark:text-slate-300 ml-4" {...props}>{children}</ol>
+    ),
+    li: ({ children, ...props }: any) => (
+        <li className="leading-relaxed" {...props}>{children}</li>
+    ),
+    table: ({ children }: any) => (
+        <div className="table-container shadow-2xl my-16 overflow-x-auto rounded-xl">
+            <table className="w-full text-left border-collapse">{children}</table>
+        </div>
+    ),
+    thead: ({ children, ...props }: any) => <thead className="bg-slate-100 dark:bg-slate-800/50" {...props}>{children}</thead>,
+    th: ({ children, ...props }: any) => <th className="py-4 px-6 font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-700" {...props}>{children}</th>,
+    tbody: ({ children, ...props }: any) => <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50" {...props}>{children}</tbody>,
+    tr: ({ children, ...props }: any) => <tr className="hover:bg-slate-50 dark:hover:bg-slate-900/20 transition-colors" {...props}>{children}</tr>,
+    td: ({ children, ...props }: any) => <td className="py-4 px-6 text-slate-700 dark:text-slate-300" {...props}>{children}</td>,
+};
 
 export const Post = () => {
     const { slug } = useParams<{ slug: string }>();
@@ -69,11 +118,11 @@ export const Post = () => {
                 <h2 className="text-2xl font-bold mb-4">Postagem não encontrada</h2>
                 <p className="text-slate-500 mb-8 max-w-sm text-center">O artigo que você procura não existe ou ainda não foi publicado.</p>
                 <button
-                    onClick={() => navigate('/capitulos')}
+                    onClick={() => navigate('/artigos')}
                     className="flex items-center gap-2 px-6 py-3 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:brightness-110 transition-all text-sm"
                 >
                     <span className="material-symbols-outlined text-xl">arrow_back</span>
-                    Voltar para o Índice
+                    Voltar para Artigos
                 </button>
             </div>
         );
@@ -94,11 +143,11 @@ export const Post = () => {
                 <h2 className="text-2xl font-bold mb-4">Postagem não encontrada</h2>
                 <p className="text-slate-500 mb-8 max-w-sm text-center">O artigo que você procura não existe ou ainda não foi publicado.</p>
                 <button
-                    onClick={() => navigate('/capitulos')}
+                    onClick={() => navigate('/artigos')}
                     className="flex items-center gap-2 px-6 py-3 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:brightness-110 transition-all text-sm"
                 >
                     <span className="material-symbols-outlined text-xl">arrow_back</span>
-                    Voltar para o Índice
+                    Voltar para Artigos
                 </button>
             </div>
         );
@@ -119,7 +168,7 @@ export const Post = () => {
                 image={post.coverImage}
             />
             {/* Header Visual */}
-            <header className="relative h-[60vh] md:h-[70vh] w-full overflow-hidden flex items-end">
+            <header className="relative min-h-[60vh] md:min-h-[70vh] w-full overflow-hidden flex items-end">
                 <div className="absolute inset-0 scale-105">
                     {post.coverImage ? (
                         <img src={post.coverImage} alt={post.title} className="w-full h-full object-cover" />
@@ -129,7 +178,7 @@ export const Post = () => {
                     <div className="absolute inset-0 bg-gradient-to-t from-dark-bg via-dark-bg/60 to-transparent"></div>
                 </div>
 
-                <div className="relative w-full pb-20 px-6 fade-up z-10">
+                <div className="relative w-full pt-24 pb-20 px-6 fade-up z-10">
                     <div className="max-w-5xl mx-auto">
                         <div className="flex flex-col items-center text-center">
                             <div className="w-12 h-[2px] bg-primary mb-8 text-white"></div>
@@ -173,11 +222,14 @@ export const Post = () => {
             </header>
 
             {/* Conteúdo Principal do Supabase */}
-            <main className="max-w-3xl mx-auto px-6 py-16 md:py-24 bg-white dark:bg-dark-bg w-full relative z-20">
-                <article className="prose-custom font-serif transition-all duration-300 prose prose-invert dark:prose-invert max-w-none">
-                    {/* Renderizar conteúdo como HTML */}
-                    <div dangerouslySetInnerHTML={{ __html: post.content }} />
+            <main className="max-w-3xl mx-auto px-6 py-16 md:py-24 w-full relative z-20">
+                <article className="prose-custom font-serif transition-all duration-300">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+                        {post.content}
+                    </ReactMarkdown>
                 </article>
+
+                <AmazonCTA />
 
                 {/* Navegação Final de Artigo */}
                 <footer className="mt-24 pt-16 border-t border-slate-200 dark:border-white/5">
@@ -186,18 +238,18 @@ export const Post = () => {
                             <span className="text-[10px] uppercase tracking-widest text-slate-500 font-bold block mb-1">Gostou da leitura?</span>
                             <h4 className="font-serif italic text-lg text-slate-800 dark:text-slate-200">Deixe seu comentário abaixo</h4>
                         </div>
-                        <button onClick={() => navigate('/capitulos')} className="p-4 rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-white transition-colors group relative overflow-hidden flex items-center justify-center shrink-0">
+                        <button onClick={() => navigate('/artigos')} className="flex items-center gap-2 px-5 py-3 bg-primary/10 text-primary group relative overflow-hidden rounded-xl font-bold text-sm shrink-0 transition-colors">
                             <div className="absolute inset-0 bg-primary translate-y-[100%] group-hover:translate-y-0 transition-transform duration-300 ease-out z-0"></div>
-                            <span className="material-symbols-outlined relative z-10 transition-transform group-hover:scale-110">arrow_back</span>
+                            <span className="material-symbols-outlined relative z-10 text-xl group-hover:text-white transition-colors">arrow_back</span>
+                            <span className="relative z-10 uppercase tracking-widest text-[11px] group-hover:text-white transition-colors">Artigos</span>
                         </button>
                     </div>
                 </footer>
-            </main>
 
-            {/* Comments */}
-            <section className="bg-slate-50 dark:bg-[#0a0f18] pb-24 px-6 pt-12">
-                <CommentSection chapterId={`post-${slug}`} />
-            </section>
+                <div className="mt-24">
+                    <CommentSection chapterId={`post-${slug}`} />
+                </div>
+            </main>
         </React.Fragment>
     );
 };

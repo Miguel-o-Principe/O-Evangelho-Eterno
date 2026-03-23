@@ -72,7 +72,6 @@ function App() {
                   <Route path="/rede-de-tags" element={<TagNetwork />} />
                   <Route path="/sobre-a-obra" element={<AboutBook />} />
                   <Route path="/sobre-o-autor" element={<AboutAuthor />} />
-                  <Route path="/post/:slug" element={<Post />} />
                 </Route>
 
                 {/* Rota Protegida de Configurações */}
@@ -87,6 +86,7 @@ function App() {
                 <Route element={<ReaderLayout />}>
                   <Route path="/capitulo/:id" element={<Chapter />} />
                   <Route path="/capitulo/:chapterId/secao/:sectionId" element={<DynamicSection />} />
+                  <Route path="/post/:slug" element={<Post />} />
                 </Route>
 
                 {/* Rota 404 (fallback) */}
