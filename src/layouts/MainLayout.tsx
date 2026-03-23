@@ -3,6 +3,7 @@ import { Link, Outlet } from 'react-router-dom';
 import { MainNavbar } from '../components/MainNavbar';
 import { MainFooter } from '../components/MainFooter';
 import { NotificationsCenter } from '../components/NotificationsCenter';
+import { InstallPWABanner } from '../components/InstallPWABanner';
 
 export const MainLayout = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -38,6 +39,9 @@ export const MainLayout = () => {
 
                 {/* Notifications Center */}
                 <NotificationsCenter isOpen={notificationsOpen} onClose={() => setNotificationsOpen(false)} />
+
+                {/* PWA Install Banner */}
+                <InstallPWABanner />
             </div>
         </div>
     );
