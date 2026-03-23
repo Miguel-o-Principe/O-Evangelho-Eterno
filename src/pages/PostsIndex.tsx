@@ -141,7 +141,7 @@ export const PostsIndex = () => {
                                                 {post.title}
                                             </h2>
 
-                                            <p className="text-slate-600 dark:text-slate-400 font-light text-base leading-relaxed mb-4 line-clamp-2">
+                                            <p className="text-slate-600 dark:text-slate-400 font-light text-base leading-relaxed mb-4">
                                                 {post.description}
                                             </p>
 

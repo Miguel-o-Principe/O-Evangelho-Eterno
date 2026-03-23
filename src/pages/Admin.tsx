@@ -513,6 +513,7 @@ export const Admin = () => {
                                         </div>
                                         <p className="font-bold text-sm truncate mb-0.5">{post.title}</p>
                                         <p className="text-xs text-slate-500 dark:text-slate-400 truncate">por <span className="font-medium">{post.author}</span></p>
+                                        {post.description && <p className="text-xs text-slate-400 dark:text-slate-500 mt-1 leading-relaxed">{post.description}</p>}
                                     </div>
                                     <div className="flex items-center gap-1 shrink-0">
                                         <button onClick={() => togglePublished(post.id, 'posts', post.published)} title={post.published ? 'Despublicar' : 'Publicar'} className="p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-colors">
