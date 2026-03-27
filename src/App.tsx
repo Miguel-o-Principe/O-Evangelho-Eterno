@@ -22,7 +22,6 @@ import { PostsIndex } from './pages/PostsIndex';
 import { Post } from './pages/Post';
 import { Search } from './pages/Search';
 import { Admin } from './pages/Admin';
-import { DynamicSection } from './pages/DynamicSection';
 import { TagNetwork } from './pages/TagNetwork';
 
 const ProtectedRoute = ({ children, adminOnly = false }: { children: React.ReactNode; adminOnly?: boolean }) => {
@@ -85,7 +84,6 @@ function App() {
                 {/* Rotas do Leitor (Públicas) */}
                 <Route element={<ReaderLayout />}>
                   <Route path="/capitulo/:id" element={<Chapter />} />
-                  <Route path="/capitulo/:chapterId/secao/:sectionId" element={<DynamicSection />} />
                   <Route path="/post/:slug" element={<Post />} />
                 </Route>
 

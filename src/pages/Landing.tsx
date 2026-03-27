@@ -1,10 +1,29 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
+import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabase';
 
 export const Landing = () => {
     const { theme, toggleTheme } = useTheme();
+    const { user, session } = useAuth();
     const navigate = useNavigate();
+    const [userMenuOpen, setUserMenuOpen] = useState(false);
+
+    const handleLogout = async () => {
+        await supabase.auth.signOut();
+        setUserMenuOpen(false);
+    };
+
+    useEffect(() => {
+        const closeMenu = (e: MouseEvent) => {
+            if (!(e.target as Element).closest('.user-menu-container')) {
+                setUserMenuOpen(false);
+            }
+        };
+        document.addEventListener('click', closeMenu);
+        return () => document.removeEventListener('click', closeMenu);
+    }, []);
 
     return (
         <div className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen antialiased transition-colors duration-300 flex flex-col overflow-x-hidden">
@@ -15,12 +34,43 @@ export const Landing = () => {
                 </div>
 
                 <div className="flex items-center gap-4">
-                    <Link to="/login" className="text-sm font-bold text-slate-600 hover:text-primary dark:text-slate-400 dark:hover:text-primary transition-colors">
-                        Fazer Login
-                    </Link>
                     <button onClick={toggleTheme} className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors" title="Alternar tema">
                         <span className="material-symbols-outlined">{theme === 'dark' ? 'light_mode' : 'dark_mode'}</span>
                     </button>
+
+                    {session ? (
+                        <div className="relative user-menu-container">
+                            <button
+                                onClick={() => setUserMenuOpen(!userMenuOpen)}
+                                className="size-10 rounded-full border border-slate-200 dark:border-slate-700 hover:ring-2 hover:ring-primary transition-all overflow-hidden shadow-sm"
+                                title="Menu do Usuário"
+                            >
+                                <img
+                                    src={user?.user_metadata?.avatar_url || user?.user_metadata?.picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.user_metadata?.full_name || 'User')}&background=random`}
+                                    alt="Avatar"
+                                    className="w-full h-full object-cover"
+                                />
+                            </button>
+                            {userMenuOpen && (
+                                <div className="absolute right-0 mt-3 w-48 bg-white dark:bg-card-dark border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl py-3 z-50 animate-slideIn">
+                                    <div className="px-5 py-2 mb-2 border-b border-slate-100 dark:border-white/5">
+                                        <p className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">{user?.user_metadata?.full_name || 'Usuário'}</p>
+                                        <p className="text-[10px] text-slate-500 truncate">{user?.email}</p>
+                                    </div>
+                                    <Link to="/configuracoes" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-3 px-5 py-2.5 text-sm hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                                        <span className="material-symbols-outlined text-xl opacity-60">settings</span> Configurações
+                                    </Link>
+                                    <button onClick={handleLogout} className="w-full flex items-center gap-3 px-5 py-2.5 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors text-left">
+                                        <span className="material-symbols-outlined text-xl opacity-80">logout</span> Sair
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <Link to="/login" className="text-sm font-bold text-slate-600 hover:text-primary dark:text-slate-400 dark:hover:text-primary transition-colors">
+                            Fazer Login
+                        </Link>
+                    )}
                 </div>
             </nav>
 

@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import MDEditor from '@uiw/react-md-editor';
 import { useAuth } from '../contexts/AuthContext';
 import { useChapters, ChapterSummary } from '../hooks/useChapters';
-import { useAllSectionsGrouped, SectionSummary } from '../hooks/useChapterSections';
 import { usePosts, PostMeta } from '../hooks/usePosts';
 import { supabase } from '../lib/supabase';
 import { TagInput } from '../components/TagInput';
@@ -13,20 +12,15 @@ interface ChapterForm {
     order_num: number; title: string; subtitle: string; tag_line: string;
     image_url: string; description: string; content: string; read_time: number; published: boolean; tags: string[];
 }
-interface SectionForm {
-    chapter_id: string; order_num: number; title: string; subtitle: string; tag_line: string;
-    description: string; content: string; read_time: number; published: boolean; tags: string[];
-}
 interface PostForm {
     title: string; description: string; author: string; slug: string;
     content: string; cover_image: string; read_time: number; published: boolean; tags: string[];
 }
 
 const emptyChapterForm: ChapterForm = { order_num: 0, title: '', subtitle: '', tag_line: '', image_url: '', description: '', content: '', read_time: 30, published: false, tags: [] };
-const emptySectionForm: SectionForm = { chapter_id: '', order_num: 1, title: '', subtitle: '', tag_line: '', description: '', content: '', read_time: 15, published: false, tags: [] };
 const emptyPostForm: PostForm = { title: '', description: '', author: '', slug: '', content: '', cover_image: '', read_time: 15, published: true, tags: [] };
 
-type EditMode = 'chapter' | 'section' | 'post' | null;
+type EditMode = 'chapter' | 'post' | null;
 
 // ─── Shared Form Panel ─────────────────────────────────────────────────────────
 const FormPanel = ({ title, onClose, onSave, saving, saveMsg, children }: { title: string; onClose: () => void; onSave: () => void; saving: boolean; saveMsg: string; children: React.ReactNode; }) => (
@@ -74,17 +68,21 @@ export const Admin = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
     const { chapters, loading: chapLoading } = useChapters(true);
-    const { sectionsMap, loading: secLoading } = useAllSectionsGrouped(true);
     const { posts, loading: postsLoading } = usePosts(true);
 
-    const [expandedChapter, setExpandedChapter] = useState<string | null>(null);
-    const [activeTab, setActiveTab] = useState<'chapters' | 'posts'>('chapters');
+
+    const [activeTab, setActiveTab] = useState<'chapters' | 'posts'>(
+        () => (sessionStorage.getItem('adminActiveTab') as 'chapters' | 'posts') || 'chapters'
+    );
+
+    const changeTab = (tab: 'chapters' | 'posts') => {
+        sessionStorage.setItem('adminActiveTab', tab);
+        setActiveTab(tab);
+    };
     const [editMode, setEditMode] = useState<EditMode>(null);
     const [editingChapterId, setEditingChapterId] = useState<string | null>(null);
-    const [editingSectionId, setEditingSectionId] = useState<string | null>(null);
     const [editingPostId, setEditingPostId] = useState<string | null>(null);
     const [chapterForm, setChapterForm] = useState<ChapterForm>(emptyChapterForm);
-    const [sectionForm, setSectionForm] = useState<SectionForm>(emptySectionForm);
     const [postForm, setPostForm] = useState<PostForm>(emptyPostForm);
     const [saving, setSaving] = useState(false);
     const [saveMsg, setSaveMsg] = useState('');
@@ -96,19 +94,17 @@ export const Admin = () => {
 
     // ── Edit chapter ──
     const startEditChapter = async (chap: ChapterSummary) => {
-        setActiveTab('chapters');
+        changeTab('chapters');
         setEditMode('chapter');
         setEditingChapterId(chap.id);
-        setEditingSectionId(null);
         const { data } = await supabase.from('chapters').select('*').eq('id', chap.id).single();
         if (data) setChapterForm({ order_num: data.order_num, title: data.title, subtitle: data.subtitle, tag_line: data.tag_line, image_url: data.image_url, description: data.description, content: data.content, read_time: data.read_time, published: data.published, tags: data.tags || [] });
     };
 
     const startCreateChapter = () => {
-        setActiveTab('chapters');
+        changeTab('chapters');
         setEditMode('chapter');
         setEditingChapterId(null);
-        setEditingSectionId(null);
         const nextOrder = chapters.length > 0 ? Math.max(...chapters.map(c => c.order_num)) + 1 : 1;
         setChapterForm({ ...emptyChapterForm, order_num: nextOrder });
         setSaveMsg('');
@@ -128,51 +124,12 @@ export const Admin = () => {
         if (!saving) setTimeout(() => window.location.reload(), 1200);
     };
 
-    // ── Edit section ──
-    const startEditSection = async (sec: SectionSummary) => {
-        setActiveTab('chapters');
-        setEditMode('section');
-        setEditingSectionId(sec.id);
-        setEditingChapterId(null);
-        const { data } = await supabase.from('chapter_sections').select('*').eq('id', sec.id).single();
-        if (data) setSectionForm({ chapter_id: data.chapter_id, order_num: data.order_num, title: data.title, subtitle: data.subtitle, tag_line: data.tag_line, description: data.description, content: data.content, read_time: data.read_time, published: data.published, tags: data.tags || [] });
-    };
-
-    const startCreateSection = (chap: ChapterSummary) => {
-        setActiveTab('chapters');
-        setEditMode('section');
-        setEditingSectionId(null);
-        setEditingChapterId(null);
-        setExpandedChapter(chap.id);
-        const existing = sectionsMap[chap.id] || [];
-        const nextOrder = existing.length > 0 ? Math.max(...existing.map(s => s.order_num)) + 1 : 1;
-        setSectionForm({ ...emptySectionForm, chapter_id: chap.id, order_num: nextOrder });
-        setSaveMsg('');
-    };
-
-    const saveSection = async () => {
-        setSaving(true); setSaveMsg('');
-        if (editingSectionId) {
-            const { error } = await supabase.from('chapter_sections').update(sectionForm).eq('id', editingSectionId);
-            setSaveMsg(error ? '❌ ' + error.message : '✅ Salvo!');
-        } else {
-            const { error } = await supabase.from('chapter_sections').insert(sectionForm);
-            setSaveMsg(error ? '❌ ' + error.message : '✅ Seção criada!');
-            if (!error) { cancelEdit(); }
-        }
-        setSaving(false);
-        if (!saving) setTimeout(() => window.location.reload(), 1200);
-    };
-
-    const cancelEdit = () => { setEditMode(null); setEditingChapterId(null); setEditingSectionId(null); setEditingPostId(null); setSaveMsg(''); };
-
     // ── Edit post ──
     const startEditPost = async (post: PostMeta) => {
-        setActiveTab('posts');
+        changeTab('posts');
         setEditMode('post');
         setEditingPostId(post.id);
         setEditingChapterId(null);
-        setEditingSectionId(null);
         const { data } = await supabase.from('posts').select('*').eq('id', post.id).single();
         if (data) {
             setPostForm({
@@ -189,12 +146,13 @@ export const Admin = () => {
         }
     };
 
+    const cancelEdit = () => { setEditMode(null); setEditingChapterId(null); setEditingPostId(null); setSaveMsg(''); };
+
     const startCreatePost = () => {
-        setActiveTab('posts');
+        changeTab('posts');
         setEditMode('post');
         setEditingPostId(null);
         setEditingChapterId(null);
-        setEditingSectionId(null);
         setPostForm(emptyPostForm);
         setSaveMsg('');
     };
@@ -235,21 +193,21 @@ export const Admin = () => {
         if (!saving) setTimeout(() => window.location.reload(), 1200);
     };
 
-    const saveInlineEdit = async (id: string, table: 'chapters' | 'chapter_sections' | 'posts', field: string, value: string) => {
+    const saveInlineEdit = async (id: string, table: 'chapters' | 'posts', field: string, value: string) => {
         const parsed: any = field === 'read_time' ? (parseInt(value) || 0) : value;
         await supabase.from(table).update({ [field]: parsed }).eq('id', id);
         setInlineEdit(null);
         window.location.reload();
     };
 
-    const togglePublished = async (id: string, table: 'chapters' | 'chapter_sections' | 'posts', current: boolean) => {
+    const togglePublished = async (id: string, table: 'chapters' | 'posts', current: boolean) => {
         await supabase.from(table).update({ published: !current }).eq('id', id);
         window.location.reload();
     };
 
     const handleDelete = async () => {
         if (!deleteConfirm) return;
-        const table = deleteConfirm.type === 'chapter' ? 'chapters' : deleteConfirm.type === 'section' ? 'chapter_sections' : 'posts';
+        const table = deleteConfirm.type === 'chapter' ? 'chapters' : 'posts';
         await supabase.from(table).delete().eq('id', deleteConfirm.id);
         setDeleteConfirm(null);
         window.location.reload();
@@ -268,14 +226,14 @@ export const Admin = () => {
             <div className="border-b border-slate-200 dark:border-white/5 sticky top-16 z-30 bg-background-light dark:bg-dark-bg">
                 <div className="max-w-7xl mx-auto px-6 flex gap-8">
                     <button
-                        onClick={() => { setActiveTab('chapters'); setEditMode(null); setEditingChapterId(null); setEditingSectionId(null); setEditingPostId(null); }}
+                        onClick={() => { changeTab('chapters'); setEditMode(null); setEditingChapterId(null); setEditingPostId(null); }}
                         className={`py-4 px-2 font-bold text-sm uppercase tracking-widest border-b-2 transition-all ${activeTab === 'chapters' ? 'border-primary text-primary' : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
                     >
                         <span className="material-symbols-outlined inline mr-2 text-base align-middle">menu_book</span>
                         Capítulos & Seções ({chapters.length})
                     </button>
                     <button
-                        onClick={() => { setActiveTab('posts'); setEditMode(null); setEditingChapterId(null); setEditingSectionId(null); setEditingPostId(null); }}
+                        onClick={() => { changeTab('posts'); setEditMode(null); setEditingChapterId(null); setEditingPostId(null); }}
                         className={`py-4 px-2 font-bold text-sm uppercase tracking-widest border-b-2 transition-all ${activeTab === 'posts' ? 'border-primary text-primary' : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
                     >
                         <span className="material-symbols-outlined inline mr-2 text-base align-middle">article</span>
@@ -293,21 +251,18 @@ export const Admin = () => {
                                 <span className="material-symbols-outlined text-base">menu_book</span>
                                 {chapters.length} Capítulos
                             </h2>
-                            <p className="text-xs text-slate-400">Organize e edite todos os capítulos e suas respectivas seções.</p>
+                            <p className="text-xs text-slate-400">Organize e edite todos os capítulos.</p>
                         </div>
 
-                        {(chapLoading || secLoading) ? (
+                        {chapLoading ? (
                             <div className="flex justify-center py-12">
                                 <span className="material-symbols-outlined animate-spin text-4xl text-primary">sync</span>
                             </div>
                         ) : chapters.map((chap) => {
-                            const isExpanded = expandedChapter === chap.id;
-                            const sections = sectionsMap[chap.id] || [];
                             const isEditingThis = editingChapterId === chap.id;
 
                             return (
                                 <div key={chap.id}>
-                                    {/* Chapter row */}
                                     <div className={`flex items-center gap-3 p-4 rounded-2xl border transition-all ${isEditingThis ? 'border-primary bg-primary/5 dark:bg-primary/10' : 'border-slate-200 dark:border-white/5 bg-white dark:bg-card-dark'}`}>
                                         <div className="size-11 rounded-xl overflow-hidden shrink-0">
                                             <img src={chap.image_url} alt="" className="w-full h-full object-cover" />
@@ -318,9 +273,6 @@ export const Admin = () => {
                                                 <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full ${chap.published ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'}`}>
                                                     {chap.published ? 'Publicado' : 'Rascunho'}
                                                 </span>
-                                                {sections.length > 0 && (
-                                                    <span className="text-[9px] font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 dark:text-slate-500 px-1.5 py-0.5 rounded-full">{sections.length} seç.</span>
-                                                )}
                                                 {inlineEdit?.id === chap.id && inlineEdit.field === 'read_time' ? (
                                                     <input type="number" autoFocus
                                                         className="w-16 px-1.5 py-0.5 text-[10px] rounded-full border border-primary outline-none bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200"
@@ -336,14 +288,6 @@ export const Admin = () => {
                                             <p className="font-bold text-sm truncate mt-0.5">{chap.title}</p>
                                         </div>
                                         <div className="flex items-center gap-1 shrink-0">
-                                            {/* Expand sections */}
-                                            <button onClick={() => setExpandedChapter(isExpanded ? null : chap.id)} title="Ver seções" className="p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-colors">
-                                                <span className={`material-symbols-outlined text-sm transition-transform ${isExpanded ? 'rotate-180' : ''}`}>expand_more</span>
-                                            </button>
-                                            {/* Add section */}
-                                            <button onClick={() => startCreateSection(chap)} title="Adicionar seção" className="p-2 hover:bg-primary/10 text-primary rounded-lg transition-colors">
-                                                <span className="material-symbols-outlined text-sm">bookmark_add</span>
-                                            </button>
                                             <button onClick={() => togglePublished(chap.id, 'chapters', chap.published)} title={chap.published ? 'Despublicar' : 'Publicar'} className="p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-colors">
                                                 <span className="material-symbols-outlined text-sm">{chap.published ? 'visibility_off' : 'visibility'}</span>
                                             </button>
@@ -365,77 +309,6 @@ export const Admin = () => {
                                             )}
                                         </div>
                                     </div>
-
-                                    {/* Sections (nested, expanded) */}
-                                    {isExpanded && (
-                                        <div className="ml-8 mt-1.5 space-y-1.5">
-                                            {sections.length === 0 ? (
-                                                <div className="p-4 rounded-xl border border-dashed border-slate-200 dark:border-white/5 text-center">
-                                                    <p className="text-xs text-slate-400">Nenhuma seção ainda.</p>
-                                                    <button onClick={() => startCreateSection(chap)} className="mt-2 text-xs text-primary font-bold hover:underline flex items-center gap-1 mx-auto">
-                                                        <span className="material-symbols-outlined text-sm">add</span> Adicionar primeira seção
-                                                    </button>
-                                                </div>
-                                            ) : sections.map((sec) => {
-                                                const isEditingSec = editingSectionId === sec.id;
-                                                return (
-                                                    <div key={sec.id} className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${isEditingSec ? 'border-primary bg-primary/5 dark:bg-primary/10' : 'border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-dark-bg/50'}`}>
-                                                        {/* Section thumbnail (chapter image) */}
-                                                        <div className="size-8 rounded-lg overflow-hidden shrink-0">
-                                                            <img src={chap.image_url} alt="" className="w-full h-full object-cover opacity-70" />
-                                                        </div>
-                                                        <div className="flex-1 min-w-0">
-                                                            <div className="flex items-center gap-1.5 flex-wrap">
-                                                                <span className="text-[8px] font-bold uppercase tracking-widest text-primary/80">Seç. {String(sec.order_num).padStart(2, '0')}</span>
-                                                                <span className={`text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full ${sec.published ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400'}`}>
-                                                                    {sec.published ? 'Publicado' : 'Rascunho'}
-                                                                </span>
-                                                                {inlineEdit?.id === sec.id && inlineEdit.field === 'read_time' ? (
-                                                                    <input type="number" autoFocus
-                                                                        className="w-14 px-1 py-0.5 text-[9px] rounded-full border border-primary outline-none bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200"
-                                                                        value={inlineEdit.value}
-                                                                        onChange={e => setInlineEdit({ ...inlineEdit, value: e.target.value })}
-                                                                        onBlur={() => saveInlineEdit(sec.id, 'chapter_sections', 'read_time', inlineEdit.value)}
-                                                                        onKeyDown={e => { if (e.key === 'Enter') saveInlineEdit(sec.id, 'chapter_sections', 'read_time', inlineEdit.value); if (e.key === 'Escape') setInlineEdit(null); }}
-                                                                    />
-                                                                ) : (
-                                                                    <span onClick={() => setInlineEdit({ id: sec.id, field: 'read_time', value: String(sec.read_time) })} title="Clique para editar tempo de leitura" className="text-[8px] text-slate-400 bg-slate-100 dark:bg-slate-800 dark:text-slate-500 px-1.5 py-0.5 rounded-full cursor-pointer hover:bg-primary/10 hover:text-primary transition-colors">⏱ {sec.read_time} min</span>
-                                                                )}
-                                                            </div>
-                                                            <p className="font-semibold text-xs truncate mt-0.5">{sec.title}</p>
-                                                        </div>
-                                                        <div className="flex items-center gap-0.5 shrink-0">
-                                                            <button onClick={() => togglePublished(sec.id, 'chapter_sections', sec.published)} title={sec.published ? 'Despublicar' : 'Publicar'} className="p-1.5 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-colors">
-                                                                <span className="material-symbols-outlined text-xs">{sec.published ? 'visibility_off' : 'visibility'}</span>
-                                                            </button>
-                                                            <button onClick={() => startEditSection(sec)} title="Editar" className="p-1.5 hover:bg-primary/10 text-primary rounded-lg transition-colors">
-                                                                <span className="material-symbols-outlined text-xs">edit</span>
-                                                            </button>
-                                                            <button onClick={() => navigate(`/capitulo/${chap.order_num}/secao/${sec.id}`)} title="Visualizar" className="p-1.5 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-colors">
-                                                                <span className="material-symbols-outlined text-xs">open_in_new</span>
-                                                            </button>
-                                                            {deleteConfirm?.id === sec.id ? (
-                                                                <>
-                                                                    <button onClick={handleDelete} className="px-2 py-1 bg-red-500 text-white text-[8px] font-bold rounded-lg">Confirmar</button>
-                                                                    <button onClick={() => setDeleteConfirm(null)} className="px-1.5 py-1 text-[8px] font-bold rounded-lg hover:bg-slate-100 dark:hover:bg-white/5">✕</button>
-                                                                </>
-                                                            ) : (
-                                                                <button onClick={() => setDeleteConfirm({ id: sec.id, type: 'section' })} title="Excluir" className="p-1.5 hover:bg-red-50 dark:hover:bg-red-500/10 text-slate-400 hover:text-red-500 rounded-lg transition-colors">
-                                                                    <span className="material-symbols-outlined text-xs">delete</span>
-                                                                </button>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                );
-                                            })}
-                                            {/* Add more section button */}
-                                            {sections.length > 0 && (
-                                                <button onClick={() => startCreateSection(chap)} className="w-full flex items-center justify-center gap-1.5 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-primary border border-dashed border-slate-200 dark:border-white/5 rounded-xl hover:border-primary/30 transition-all">
-                                                    <span className="material-symbols-outlined text-sm">add</span> Nova seção
-                                                </button>
-                                            )}
-                                        </div>
-                                    )}
                                 </div>
                             );
                         })}
@@ -572,42 +445,6 @@ export const Admin = () => {
                             <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
                                 <div><p className="font-bold text-sm">Publicado</p><p className="text-[11px] text-slate-500">Visível publicamente</p></div>
                                 <Toggle value={chapterForm.published} onChange={v => setChapterForm({ ...chapterForm, published: v })} />
-                            </div>
-                        </FormPanel>
-                    )}
-
-                    {showForm && editMode === 'section' && (
-                        <FormPanel title={editingSectionId ? 'Editar Seção' : 'Nova Seção'} onClose={cancelEdit} onSave={saveSection} saving={saving} saveMsg={saveMsg}>
-                            <div className="p-3 rounded-xl bg-primary/5 border border-primary/20 text-xs text-primary font-bold flex items-center gap-2">
-                                <span className="material-symbols-outlined text-sm">bookmark</span>
-                                Subseção do Capítulo
-                                <span className="ml-auto font-normal text-slate-500">Imagem = a do capítulo pai</span>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <Field label="Ordem" value={sectionForm.order_num} onChange={v => setSectionForm({ ...sectionForm, order_num: parseInt(v) || 1 })} type="number" />
-                                <Field label="Tempo (min)" value={sectionForm.read_time} onChange={v => setSectionForm({ ...sectionForm, read_time: parseInt(v) || 15 })} type="number" />
-                            </div>
-                            <Field label="Título" value={sectionForm.title} onChange={v => setSectionForm({ ...sectionForm, title: v })} placeholder="Nome da subseção" />
-                            <Field label="Subtítulo" value={sectionForm.subtitle} onChange={v => setSectionForm({ ...sectionForm, subtitle: v })} placeholder="Descrição longa do header" />
-                            <Field label="Tag / Linha descritiva" value={sectionForm.tag_line} onChange={v => setSectionForm({ ...sectionForm, tag_line: v })} placeholder="Análise / Exegese..." />
-                            <div>
-                                <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Descrição (card)</label>
-                                <textarea value={sectionForm.description} onChange={e => setSectionForm({ ...sectionForm, description: e.target.value })} rows={2}
-                                    className="w-full px-4 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-primary/30 resize-none" />
-                            </div>
-                            <div>
-                                <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Conteúdo (Markdown)</label>
-                                <div data-color-mode="auto" className="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700">
-                                    <MDEditor value={sectionForm.content} onChange={val => setSectionForm({ ...sectionForm, content: val || '' })} height={400} preview="edit" />
-                                </div>
-                            </div>
-                            <div>
-                                <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Tags</label>
-                                <TagInput tags={sectionForm.tags} onChange={v => setSectionForm({ ...sectionForm, tags: v })} />
-                            </div>
-                            <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
-                                <div><p className="font-bold text-sm">Publicado</p><p className="text-[11px] text-slate-500">Visível publicamente</p></div>
-                                <Toggle value={sectionForm.published} onChange={v => setSectionForm({ ...sectionForm, published: v })} />
                             </div>
                         </FormPanel>
                     )}

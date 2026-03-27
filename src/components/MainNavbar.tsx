@@ -18,6 +18,28 @@ export const MainNavbar: React.FC<MainNavbarProps> = ({ onMenuToggle, onNotifica
     const location = useLocation();
     const navigate = useNavigate();
 
+    const [historyIndex, setHistoryIndex] = useState(() => window.history.state?.idx ?? 0);
+    const [maxHistoryIndex, setMaxHistoryIndex] = useState(() => window.history.state?.idx ?? 0);
+
+    useEffect(() => {
+        const handlePopState = () => {
+            const idx = window.history.state?.idx ?? 0;
+            setHistoryIndex(idx);
+            setMaxHistoryIndex(prev => Math.max(prev, idx));
+        };
+        window.addEventListener('popstate', handlePopState);
+        return () => window.removeEventListener('popstate', handlePopState);
+    }, []);
+
+    useEffect(() => {
+        const idx = window.history.state?.idx ?? 0;
+        setHistoryIndex(idx);
+        setMaxHistoryIndex(prev => Math.max(prev, idx));
+    }, [location]);
+
+    const canGoBack = historyIndex > 0;
+    const canGoForward = historyIndex < maxHistoryIndex;
+
     const handleLogout = async () => {
         await supabase.auth.signOut();
         navigate('/');
@@ -36,6 +58,24 @@ export const MainNavbar: React.FC<MainNavbarProps> = ({ onMenuToggle, onNotifica
     return (
         <header className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 px-8 sm:px-20 py-4 mb-8">
             <div className="flex items-center gap-4">
+                <div className="flex items-center gap-1">
+                    <button
+                        onClick={() => navigate(-1)}
+                        disabled={!canGoBack}
+                        className="p-1.5 rounded-full transition-colors disabled:opacity-25 disabled:cursor-not-allowed hover:bg-slate-200 dark:hover:bg-slate-800"
+                        title="Voltar"
+                    >
+                        <span className="material-symbols-outlined text-xl">arrow_back_ios</span>
+                    </button>
+                    <button
+                        onClick={() => navigate(1)}
+                        disabled={!canGoForward}
+                        className="p-1.5 rounded-full transition-colors disabled:opacity-25 disabled:cursor-not-allowed hover:bg-slate-200 dark:hover:bg-slate-800"
+                        title="Avançar"
+                    >
+                        <span className="material-symbols-outlined text-xl">arrow_forward_ios</span>
+                    </button>
+                </div>
                 <button onClick={onMenuToggle} className="md:hidden text-slate-600 dark:text-slate-400">
                     <span className="material-symbols-outlined">menu</span>
                 </button>

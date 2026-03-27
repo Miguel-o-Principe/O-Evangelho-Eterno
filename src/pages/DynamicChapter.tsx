@@ -3,7 +3,6 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useChapter } from '../hooks/useChapter';
-import { useChapterSections } from '../hooks/useChapterSections';
 import { AmazonCTA } from '../components/AmazonCTA';
 import { ChapterMeta } from '../components/ChapterMeta';
 import { CommentSection } from '../components/CommentSection';
@@ -59,7 +58,6 @@ export const DynamicChapter = () => {
     const navigate = useNavigate();
     const orderNum = parseInt(id || '1', 10);
     const { chapter, prevChapter, nextChapter, loading, error } = useChapter(orderNum);
-    const { sections, loading: sectionsLoading } = useChapterSections(chapter?.id || null);
     const sectionsScrollRef = useRef<HTMLDivElement>(null);
 
     const scrollSections = (distance: number) => {
@@ -163,69 +161,6 @@ export const DynamicChapter = () => {
                 </article>
 
                 <AmazonCTA />
-
-                {/* Carrossel de Subseções */}
-                {(sectionsLoading || sections.length > 0) && (
-                    <div className="mt-24">
-                        <div className="flex items-end justify-between mb-8">
-                            <div>
-                                <span className="text-primary font-bold text-[10px] uppercase tracking-[0.4em] block mb-2">Explore Mais</span>
-                                <h2 className="text-2xl font-serif font-bold text-slate-900 dark:text-white italic">Subseções deste Capítulo</h2>
-                            </div>
-                            <div className="flex items-center gap-2 hidden md:flex">
-                                <button onClick={() => scrollSections(-360)} className="size-9 flex items-center justify-center bg-slate-100 dark:bg-white/5 hover:bg-primary hover:text-white rounded-full transition-all">
-                                    <span className="material-symbols-outlined text-sm">chevron_left</span>
-                                </button>
-                                <button onClick={() => scrollSections(360)} className="size-9 flex items-center justify-center bg-slate-100 dark:bg-white/5 hover:bg-primary hover:text-white rounded-full transition-all">
-                                    <span className="material-symbols-outlined text-sm">chevron_right</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        {sectionsLoading ? (
-                            <div className="flex justify-center py-12">
-                                <span className="material-symbols-outlined animate-spin text-2xl text-primary">sync</span>
-                            </div>
-                        ) : (
-                            <div ref={sectionsScrollRef} className="flex flex-col sm:flex-row sm:overflow-x-auto gap-5 pb-4 no-scrollbar scroll-smooth">
-                                {sections.map((sec) => (
-                                    <div
-                                        key={sec.id}
-                                        onClick={() => navigate(`/capitulo/${id}/secao/${sec.id}`)}
-                                        className="chapter-card sm:shrink-0 sm:w-[280px] flex flex-col gap-0 rounded-2xl bg-white dark:bg-card-dark border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all overflow-hidden cursor-pointer"
-                                    >
-                                        {/* Imagem herdada do capítulo pai */}
-                                        <div
-                                            className="w-full h-36 bg-cover bg-center relative"
-                                            style={{ backgroundImage: `url('${chapter?.image_url}')` }}
-                                        >
-                                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
-                                            <div className="absolute bottom-4 left-4 right-4 text-white">
-                                                <span className="text-primary font-bold text-[9px] uppercase tracking-[0.2em] mb-1 block">
-                                                    Seção {String(sec.order_num).padStart(2, '0')}
-                                                </span>
-                                                <h3 className="text-base font-bold leading-tight italic line-clamp-2">{sec.title}</h3>
-                                            </div>
-                                        </div>
-                                        <div className="flex flex-col flex-1 p-4 gap-3">
-                                            <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed line-clamp-2">{sec.description}</p>
-                                            <div className="mt-auto flex items-center justify-between">
-                                                <span className="text-[10px] text-slate-400 flex items-center gap-1">
-                                                    <span className="material-symbols-outlined text-xs">hourglass_empty</span>
-                                                    {sec.read_time} min
-                                                </span>
-                                                <button className="flex items-center gap-1 text-primary text-[11px] font-bold group">
-                                                    Ler
-                                                    <span className="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                )}
 
                 <div className="mt-24">
                     <CommentSection chapterId={String(chapter.order_num)} />

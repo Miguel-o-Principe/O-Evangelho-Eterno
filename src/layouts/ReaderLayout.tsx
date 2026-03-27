@@ -16,6 +16,28 @@ export const ReaderLayout = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
+    const [historyIndex, setHistoryIndex] = useState(() => window.history.state?.idx ?? 0);
+    const [maxHistoryIndex, setMaxHistoryIndex] = useState(() => window.history.state?.idx ?? 0);
+
+    useEffect(() => {
+        const handlePopState = () => {
+            const idx = window.history.state?.idx ?? 0;
+            setHistoryIndex(idx);
+            setMaxHistoryIndex(prev => Math.max(prev, idx));
+        };
+        window.addEventListener('popstate', handlePopState);
+        return () => window.removeEventListener('popstate', handlePopState);
+    }, []);
+
+    useEffect(() => {
+        const idx = window.history.state?.idx ?? 0;
+        setHistoryIndex(idx);
+        setMaxHistoryIndex(prev => Math.max(prev, idx));
+    }, [location]);
+
+    const canGoBack = historyIndex > 0;
+    const canGoForward = historyIndex < maxHistoryIndex;
+
     const handleLogout = async () => {
         await supabase.auth.signOut();
         navigate('/');
@@ -61,32 +83,36 @@ export const ReaderLayout = () => {
         <div className="min-h-screen bg-background-light dark:bg-dark-bg text-slate-800 dark:text-[#f5e6c8] font-sans transition-colors duration-500">
             <nav className="glass-nav fixed top-0 w-full z-50 border-b border-slate-200 dark:border-white/10">
                 <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-                    {(() => {
-                        const path = location.pathname;
-                        if (path.startsWith('/post/')) {
-                            return (
-                                <Link to="/artigos" className="flex items-center gap-2 group transition-all">
-                                    <span className="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">arrow_back</span>
-                                    <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">Artigos</span>
-                                </Link>
-                            );
-                        }
-                        const sectionMatch = path.match(/^\/capitulo\/([^/]+)\/secao\//);
-                        if (sectionMatch) {
-                            return (
-                                <Link to={`/capitulo/${sectionMatch[1]}`} className="flex items-center gap-2 group transition-all">
-                                    <span className="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">arrow_back</span>
-                                    <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">Capítulo</span>
-                                </Link>
-                            );
-                        }
-                        return (
-                            <Link to="/capitulos" className="flex items-center gap-2 group transition-all">
+                    <div className="flex items-center gap-1">
+                        <button
+                            onClick={() => navigate(-1)}
+                            disabled={!canGoBack}
+                            className="p-1.5 rounded-full transition-colors disabled:opacity-25 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-white/5"
+                            title="Voltar"
+                        >
+                            <span className="material-symbols-outlined text-xl">arrow_back_ios</span>
+                        </button>
+                        <button
+                            onClick={() => navigate(1)}
+                            disabled={!canGoForward}
+                            className="p-1.5 rounded-full transition-colors disabled:opacity-25 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-white/5"
+                            title="Avançar"
+                        >
+                            <span className="material-symbols-outlined text-xl">arrow_forward_ios</span>
+                        </button>
+                        <div className="w-px h-4 bg-slate-300 dark:bg-slate-700 mx-1" />
+                        {location.pathname.startsWith('/post/') ? (
+                            <Link to="/artigos" className="flex items-center gap-1.5 group transition-all">
+                                <span className="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">arrow_back</span>
+                                <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">Artigos</span>
+                            </Link>
+                        ) : (
+                            <Link to="/capitulos" className="flex items-center gap-1.5 group transition-all">
                                 <span className="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">arrow_back</span>
                                 <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">Capítulos</span>
                             </Link>
-                        );
-                    })()}
+                        )}
+                    </div>
 
                     {/* Chapter info will be dynamic in the page itself, we can leave the center empty here or just static for now */}
                     <div className="hidden md:flex flex-col items-center">

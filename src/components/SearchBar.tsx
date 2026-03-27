@@ -1,14 +1,13 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useChapters } from '../hooks/useChapters';
 import { usePosts } from '../hooks/usePosts';
-import { useAllSectionsGrouped } from '../hooks/useChapterSections';
 
 interface SearchResult {
     id: string;
     title: string;
     description?: string;
-    type: 'chapter' | 'section' | 'post';
+    type: 'chapter' | 'post';
     link: string;
     category?: string;
 }
@@ -19,20 +18,6 @@ export const SearchBar: React.FC<{ compact?: boolean }> = ({ compact = false }) 
     const [isOpen, setIsOpen] = useState(false);
     const { chapters } = useChapters();
     const { posts } = usePosts();
-    const { sectionsMap } = useAllSectionsGrouped();
-
-    // Mapa de chapter.id → order_num para montar links de seções
-    const chapterOrderMap = useMemo(() => {
-        const map: Record<string, number> = {};
-        chapters.forEach(c => { map[c.id] = c.order_num; });
-        return map;
-    }, [chapters]);
-
-    // Lista plana de todas as seções
-    const allSections = useMemo(
-        () => Object.values(sectionsMap).flat(),
-        [sectionsMap]
-    );
 
     const handleSearch = useCallback((term: string) => {
         setSearchTerm(term);
@@ -83,27 +68,6 @@ export const SearchBar: React.FC<{ compact?: boolean }> = ({ compact = false }) 
             }
         });
 
-        // Subseções
-        allSections.forEach(sec => {
-            const orderNum = chapterOrderMap[sec.chapter_id];
-            if (!orderNum) return;
-            if (
-                sec.title.toLowerCase().includes(lowerTerm) ||
-                (sec.description && sec.description.toLowerCase().includes(lowerTerm)) ||
-                (sec.subtitle && sec.subtitle.toLowerCase().includes(lowerTerm)) ||
-                (sec.tags || []).some(t => t.toLowerCase().includes(lowerTerm))
-            ) {
-                searchResults.push({
-                    id: sec.id,
-                    title: sec.title,
-                    description: sec.description || sec.subtitle,
-                    type: 'section',
-                    link: `/capitulo/${orderNum}/secao/${sec.id}`,
-                    category: 'Subseção'
-                });
-            }
-        });
-
         setResults(searchResults.slice(0, 12));
         setIsOpen(true);
     }, [chapters, posts]);
@@ -119,9 +83,8 @@ export const SearchBar: React.FC<{ compact?: boolean }> = ({ compact = false }) 
         return () => document.removeEventListener('click', handleClickOutside);
     }, []);
 
-    const getIcon = (type: 'chapter' | 'section' | 'post') => {
+    const getIcon = (type: 'chapter' | 'post') => {
         if (type === 'post') return 'article';
-        if (type === 'section') return 'bookmark';
         return 'menu_book';
     };
 
