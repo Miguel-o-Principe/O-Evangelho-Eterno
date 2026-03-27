@@ -223,14 +223,14 @@ export const Admin = () => {
     return (
         <div className="min-h-screen bg-background-light dark:bg-dark-bg text-slate-800 dark:text-slate-100">
             {/* Tabs */}
-            <div className="border-b border-slate-200 dark:border-white/5 sticky top-16 z-30 bg-background-light dark:bg-dark-bg">
+            <div className="border-b border-slate-200 dark:border-white/5">
                 <div className="max-w-7xl mx-auto px-6 flex gap-8">
                     <button
                         onClick={() => { changeTab('chapters'); setEditMode(null); setEditingChapterId(null); setEditingPostId(null); }}
                         className={`py-4 px-2 font-bold text-sm uppercase tracking-widest border-b-2 transition-all ${activeTab === 'chapters' ? 'border-primary text-primary' : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
                     >
                         <span className="material-symbols-outlined inline mr-2 text-base align-middle">menu_book</span>
-                        Capítulos & Seções ({chapters.length})
+                        Capítulos ({chapters.length})
                     </button>
                     <button
                         onClick={() => { changeTab('posts'); setEditMode(null); setEditingChapterId(null); setEditingPostId(null); }}
