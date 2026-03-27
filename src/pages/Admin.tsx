@@ -24,7 +24,7 @@ type EditMode = 'chapter' | 'post' | null;
 
 // ─── Shared Form Panel ─────────────────────────────────────────────────────────
 const FormPanel = ({ title, onClose, onSave, saving, saveMsg, children }: { title: string; onClose: () => void; onSave: () => void; saving: boolean; saveMsg: string; children: React.ReactNode; }) => (
-    <div className="bg-white dark:bg-card-dark rounded-3xl border border-slate-200 dark:border-white/5 p-8 h-fit sticky top-24 overflow-y-auto max-h-[calc(100vh-7rem)]">
+    <div className="bg-white dark:bg-card-dark rounded-3xl border border-slate-200 dark:border-white/5 p-8 h-fit">
         <div className="flex items-center justify-between mb-8">
             <h2 className="font-bold text-lg">{title}</h2>
             <button onClick={onClose} className="p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-full transition-colors">
@@ -243,7 +243,7 @@ export const Admin = () => {
             </div>
 
             <div className="max-w-7xl mx-auto px-6 py-8">
-                <div className={`grid ${showForm ? 'grid-cols-1 xl:grid-cols-2' : 'grid-cols-1'} gap-8`}>
+                <div className="grid grid-cols-1 gap-8">
                     {activeTab === 'chapters' && (
                     <div className="space-y-2">
                         <div className="mb-8 pb-8 border-b-2 border-slate-100 dark:border-slate-800">
@@ -309,6 +309,40 @@ export const Admin = () => {
                                             )}
                                         </div>
                                     </div>
+                                    {isEditingThis && (
+                                        <div className="mt-3">
+                                            <FormPanel title="Editar Capítulo" onClose={cancelEdit} onSave={saveChapter} saving={saving} saveMsg={saveMsg}>
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <Field label="Número" value={chapterForm.order_num} onChange={v => setChapterForm({ ...chapterForm, order_num: parseInt(v) || 0 })} type="number" />
+                                                    <Field label="Tempo (min)" value={chapterForm.read_time} onChange={v => setChapterForm({ ...chapterForm, read_time: parseInt(v) || 30 })} type="number" />
+                                                </div>
+                                                <Field label="Título (índice)" value={chapterForm.title} onChange={v => setChapterForm({ ...chapterForm, title: v })} placeholder="A Árvore do Conhecimento" />
+                                                <Field label="Subtítulo (header)" value={chapterForm.subtitle} onChange={v => setChapterForm({ ...chapterForm, subtitle: v })} placeholder="A Topografia do Desejo..." />
+                                                <Field label="Tag / Linha descritiva" value={chapterForm.tag_line} onChange={v => setChapterForm({ ...chapterForm, tag_line: v })} placeholder="Análise Psicanalítica" />
+                                                <Field label="URL da Imagem de Capa" value={chapterForm.image_url} onChange={v => setChapterForm({ ...chapterForm, image_url: v })} placeholder="/images/capitulo-1-bg.png" />
+                                                {chapterForm.image_url && <img src={chapterForm.image_url} alt="Preview" className="h-20 w-full object-cover rounded-xl" />}
+                                                <div>
+                                                    <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Descrição (índice)</label>
+                                                    <textarea value={chapterForm.description} onChange={e => setChapterForm({ ...chapterForm, description: e.target.value })} rows={2}
+                                                        className="w-full px-4 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-primary/30 resize-none" />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Conteúdo (Markdown)</label>
+                                                    <div data-color-mode="auto" className="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700">
+                                                        <MDEditor value={chapterForm.content} onChange={val => setChapterForm({ ...chapterForm, content: val || '' })} height={400} preview="edit" />
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Tags</label>
+                                                    <TagInput tags={chapterForm.tags} onChange={v => setChapterForm({ ...chapterForm, tags: v })} />
+                                                </div>
+                                                <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+                                                    <div><p className="font-bold text-sm">Publicado</p><p className="text-[11px] text-slate-500">Visível publicamente</p></div>
+                                                    <Toggle value={chapterForm.published} onChange={v => setChapterForm({ ...chapterForm, published: v })} />
+                                                </div>
+                                            </FormPanel>
+                                        </div>
+                                    )}
                                 </div>
                             );
                         })}
@@ -345,8 +379,8 @@ export const Admin = () => {
                         ) : posts.map((post) => {
                             const isEditingThis = editingPostId === post.id;
                             return (
+                                <div key={post.id}>
                                 <div
-                                    key={post.id}
                                     className={`flex items-center gap-4 p-4 rounded-2xl border transition-all ${isEditingThis ? 'border-primary bg-primary/5 dark:bg-primary/10' : 'border-slate-200 dark:border-white/5 bg-white dark:bg-card-dark'}`}
                                 >
                                     {post.coverImage && (
@@ -410,13 +444,47 @@ export const Admin = () => {
                                         )}
                                     </div>
                                 </div>
+                                {isEditingThis && (
+                                    <div className="mt-3">
+                                            <FormPanel title={editingPostId ? 'Editar Artigo' : 'Novo Artigo'} onClose={cancelEdit} onSave={savePost} saving={saving} saveMsg={saveMsg}>
+                                                <Field label="Título" value={postForm.title} onChange={v => setPostForm({ ...postForm, title: v })} placeholder="Título do artigo" />
+                                                <Field label="Slug (URL amigável)" value={postForm.slug} onChange={v => setPostForm({ ...postForm, slug: normalizeSlug(v) })} placeholder="titulo-do-artigo" />
+                                                <Field label="Autor" value={postForm.author} onChange={v => setPostForm({ ...postForm, author: v })} placeholder="Miguel, o Príncipe" />
+                                                <Field label="URL da Imagem de Capa" value={postForm.cover_image} onChange={v => setPostForm({ ...postForm, cover_image: v })} placeholder="/images/capitulo-1-bg.png" />
+                                                {postForm.cover_image && <img src={postForm.cover_image} alt="Preview" className="h-20 w-full object-cover rounded-xl" />}
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <Field label="Tempo de leitura (min)" value={postForm.read_time} onChange={v => setPostForm({ ...postForm, read_time: parseInt(v) || 15 })} type="number" />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Descrição (resumo)</label>
+                                                    <textarea value={postForm.description} onChange={e => setPostForm({ ...postForm, description: e.target.value })} rows={2}
+                                                        className="w-full px-4 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-primary/30 resize-none" />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Conteúdo (Markdown)</label>
+                                                    <div data-color-mode="auto" className="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700">
+                                                        <MDEditor value={postForm.content} onChange={val => setPostForm({ ...postForm, content: val || '' })} height={400} preview="edit" />
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-2">Tags</label>
+                                                    <TagInput tags={postForm.tags} onChange={v => setPostForm({ ...postForm, tags: v })} />
+                                                </div>
+                                                <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+                                                    <div><p className="font-bold text-sm">Publicado</p><p className="text-[11px] text-slate-500">Visível na página de artigos</p></div>
+                                                    <Toggle value={postForm.published} onChange={v => setPostForm({ ...postForm, published: v })} />
+                                                </div>
+                                            </FormPanel>
+                                        </div>
+                                    )}
+                                </div>
                             );
                         })}
                     </div>
                     )}
 
-                    {/* ── Edit Form Panel ── */}
-                    {showForm && editMode === 'chapter' && (
+                    {/* ── New item FormPanels (when no ID = creation mode) ── */}
+                    {showForm && editMode === 'chapter' && !editingChapterId && (
                         <FormPanel title={editingChapterId ? 'Editar Capítulo' : 'Novo Capítulo'} onClose={cancelEdit} onSave={saveChapter} saving={saving} saveMsg={saveMsg}>
                             <div className="grid grid-cols-2 gap-4">
                                 <Field label="Número" value={chapterForm.order_num} onChange={v => setChapterForm({ ...chapterForm, order_num: parseInt(v) || 0 })} type="number" />
@@ -449,7 +517,7 @@ export const Admin = () => {
                         </FormPanel>
                     )}
 
-                    {showForm && editMode === 'post' && (
+                    {showForm && editMode === 'post' && !editingPostId && (
                         <FormPanel title={editingPostId ? 'Editar Artigo' : 'Novo Artigo'} onClose={cancelEdit} onSave={savePost} saving={saving} saveMsg={saveMsg}>
                             <Field label="Título" value={postForm.title} onChange={v => setPostForm({ ...postForm, title: v })} placeholder="Título do artigo" />
                             <Field label="Slug (URL amigável)" value={postForm.slug} onChange={v => setPostForm({ ...postForm, slug: normalizeSlug(v) })} placeholder="titulo-do-artigo" />
