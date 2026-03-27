@@ -79,7 +79,9 @@ function App() {
                 </Route>
 
                 {/* Rota Admin (apenas is_admin) */}
-                <Route path="/admin" element={<ProtectedRoute adminOnly><Admin /></ProtectedRoute>} />
+                <Route element={<ProtectedRoute adminOnly><MainLayout /></ProtectedRoute>}>
+                  <Route path="/admin" element={<Admin />} />
+                </Route>
 
                 {/* Rotas do Leitor (Públicas) */}
                 <Route element={<ReaderLayout />}>

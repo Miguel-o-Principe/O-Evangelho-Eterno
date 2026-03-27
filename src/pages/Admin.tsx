@@ -221,7 +221,7 @@ export const Admin = () => {
     };
 
     return (
-        <div className="min-h-screen bg-background-light dark:bg-dark-bg text-slate-800 dark:text-slate-100">
+        <div className="text-slate-800 dark:text-slate-100">
             {/* Tabs */}
             <div className="border-b border-slate-200 dark:border-white/5">
                 <div className="max-w-7xl mx-auto px-6 flex gap-8">
